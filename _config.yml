@@ -21,12 +21,12 @@ timezone: America/Toronto
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Chirpy                          # the main title
+title: Jiahuang(Jacob) Lin                          # the main title
 
-tagline: A text-focused Jekyll theme   # it will display as the sub-title
+tagline: Software Engineer @ AWS ML Compiler        # it will display as the sub-title
 
 description: >-                        # used by seo meta and the atom feed
-  A minimal, responsive, and powerful Jekyll theme for presenting professional writing.
+  Jacob's writing place
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
 url: 'https://jiahuanglin.github.io'
@@ -84,7 +84,7 @@ theme_mode: light
 img_cdn: 'https://raw.githubusercontent.com/cotes2020/chirpy-images/main'
 
 # the avatar on sidebar, support local or CORS resources
-avatar:
+avatar: assets/img/avatar.jpg
 
 # boolean type, the global switch for ToC in posts.
 toc: true
