@@ -32,10 +32,10 @@ description: >-                        # used by seo meta and the atom feed
 url: 'https://jiahuanglin.github.io'
 
 github:
-  username: jiahuanglin             # change to your github username
+  username: jiahuanglin           
 
 twitter:
-  username: twitter_username            # change to your twitter username
+  username: afferentialism      
 
 social:
   # Change to your full name.
@@ -46,8 +46,8 @@ social:
     # The first element serves as the copyright owner's link
     - https://github.com/jiahuanglin       # change to your github homepage
     - https://www.linkedin.com/in/jiahuang-jacob-l-a34585130/
+    - https://m.facebook.com/jiahuang.lin.96
     # Uncomment below to add more social links
-    # - https://www.facebook.com/username
     # - https://twitter.com/username      # change to your twitter homepage
 
 
