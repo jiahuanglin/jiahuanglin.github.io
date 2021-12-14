@@ -21,9 +21,9 @@ timezone: America/Toronto
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Jiahuang(Jacob) Lin                          # the main title
+title: Jacob Lin                          # the main title
 
-tagline: Software Engineer @ AWS ML Compiler        # it will display as the sub-title
+tagline: Software Engineer             # it will display as the sub-title
 
 description: >-                        # used by seo meta and the atom feed
   Jacob's writing place
