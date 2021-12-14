@@ -1,6 +1,8 @@
 ---
 title: Getting Started
-author: cotes
+author:
+  name: Jacob Lin
+  link: https://github.com/jiahuanglin
 date: 2019-08-09 20:55:00 +0800
 categories: [Blogging, Tutorial]
 tags: [getting started]
