@@ -61,7 +61,7 @@ public class ConcreteObserverTwo implements Observer {
   @Override 
   public void update(Message message) { 
     //TODO obtain notifications and process 
-    System.out.println("ConcreteObserverOne is notified."); 
+    System.out.println("ConcreteObserverTwo is notified."); 
   }
 ```
 
@@ -86,14 +86,14 @@ Now suppose, say after a workflow is registered, we put it on hold and notify th
 
 ```java
 public interface RegObserver {
-  void handleRegSuccess(Workflow workflow);
+  void onRegSuccess(Workflow workflow);
 }
 
 public class RegStorageObserver implements RegObserver {
   private StorageService storageService;
 
   @Override
-  public void handleRegSuccess(Workflow workflow) {
+  public void onRegSuccess(Workflow workflow) {
     WorkflowConfig config = workflow.getConfiguration();
     storageService.save(config);
   }
@@ -103,7 +103,7 @@ public class RegNotificationObserver implements RegObserver {
   private NotificationService notificationService;
 
   @Override
-  public void handleRegSuccess(Workflow workflow) {
+  public void onRegSuccess(Workflow workflow) {
     Contact owner = workflow.getOwner();
     notificationService.sendMail(owner, "Workflow is ready...");
   }
@@ -123,7 +123,7 @@ public class WorkflowManager {
     }
 
     for (RegObserver observer : regObservers) {
-      observer.handleRegSuccess(workflow);
+      observer.onRegSuccess(workflow);
     }
   }
 }
