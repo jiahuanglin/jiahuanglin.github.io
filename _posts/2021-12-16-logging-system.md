@@ -1,5 +1,5 @@
 ---
-title: Logging System
+title: Logging system
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
@@ -114,7 +114,7 @@ public interface Logger {
 }
 
 
-public class LogcLogger implements Logger{
+public class DefaultLogger implements Logger{
     private String name;
     private Writer writer;
     private LoggingLevel level = Level.INFO;
