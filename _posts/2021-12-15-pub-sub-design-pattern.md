@@ -6,6 +6,7 @@ author:
 date: 2021-12-15 21:48:00 -0500
 categories: [Tech Blog, Design Pattern]
 tags: [summary, methodology]
+render_with_liquid: false
 ---
 
 Pub-Sub design pattern is usually known as Observer pattern. I personally like to refer this pattern as `Pub-Sub` which I think better captures the essence of this pattern.
@@ -16,7 +17,7 @@ In GoF's book `Design Patterns`, it is defined as follows:
 
 Let's look at the classical implementation of this design pattern.
 
-```Java
+```java
 public interface Subject { 
   void registerObserver(Observer observer); 
   void removeObserver(Observer observer); 
@@ -66,8 +67,7 @@ public class ConcreteObserverTwo implements Observer {
 
 Let's take a look at a concrete example and see how this pattern can help. Suppose we are developing a workflow management system. Whenever a workflow is created, we need to register the configuration of the workflow into elastic storage and push workflow into execution queue. We can implement this like the following:
 
-```Java
-
+```java
 public class WorkflowManager {
   private StorageService storageService; // dependency injection
   private ExecutionQueue executionQueue; // dependency injection
@@ -84,7 +84,7 @@ public class WorkflowManager {
 
 Now suppose, say after a workflow is registered, we put it on hold and notify the creator that the workflow has been validated and created and is ready to run instead of putting it into execution. In this case, we need to frequently modify the register() function code, which violates the open-close principle. Moreover, suppose a successful registration will require more and more follow-up operations. In that case, the logic of the register() function will become more and more complex, which will affect the readability and maintainability of the code. This is where the observer pattern comes in handy. Using the observer pattern, we can refactor the above code like the following:
 
-```Java
+```java
 public interface RegObserver {
   void handleRegSuccess(Workflow workflow);
 }
