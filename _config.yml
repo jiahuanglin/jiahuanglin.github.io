@@ -23,9 +23,9 @@ timezone: America/Toronto
 
 title: Jacob Lin                          # the main title
 
-tagline: Software Engineer             # it will display as the sub-title
+tagline: Software Engineer @ AWS Compiler # it will display as the sub-title
 
-description: >-                        # used by seo meta and the atom feed
+description: >-                           # used by seo meta and the atom feed
   Jacob's writing place
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
@@ -74,7 +74,7 @@ google_analytics:
 #     light  - Use the light color scheme
 #     dark   - Use the dark color scheme
 #
-theme_mode: light
+theme_mode: # [light|dark]
 
 # The CDN endpoint for images.
 # Notice that once it is assigned, the CDN url

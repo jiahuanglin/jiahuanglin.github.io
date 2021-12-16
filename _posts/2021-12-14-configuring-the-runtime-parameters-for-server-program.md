@@ -6,7 +6,6 @@ author:
 date: 2021-12-14 20:55:00 -0500
 categories: [Tech Blog, Server Program]
 tags: [summary, methodology]
-pin: true
 ---
 
 Although we can pass argv through the main function, it is still tedious when dealing with server applications with lots of parameters that need to be specified flexibly. As a result, server programs typically support the following approaches for reading configuration files in order to start:
