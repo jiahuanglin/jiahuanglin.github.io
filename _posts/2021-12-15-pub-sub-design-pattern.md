@@ -17,8 +17,6 @@ In GoF's book `Design Patterns`, it is defined as follows:
 
 Let's look at the classical implementation of this design pattern.
 
-Java version:
-
 ```java
 public interface Subject { 
   void registerObserver(Observer observer); 
