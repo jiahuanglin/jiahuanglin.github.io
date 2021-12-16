@@ -17,6 +17,8 @@ In GoF's book `Design Patterns`, it is defined as follows:
 
 Let's look at the classical implementation of this design pattern.
 
+Java version:
+
 ```java
 public interface Subject { 
   void registerObserver(Observer observer); 
@@ -129,6 +131,55 @@ public class WorkflowManager {
 }
 ```
 
+## Appendix
+Golang implementation of Pub-Sub pattern:
+```go
+// subject.go
+type subject interface {
+    registerObserver(Observer observer)
+    removeObserver(Observer observer)
+    notifyObservers(string)
+}
 
+// event.go implements subject
+type event struct {
+    observers    []observer
+    name         string
+}
+
+func newEvent(name string) *item {
+    return &item{
+        name: name,
+    }
+}
+
+func (i *item) registerObserver(o observer) {
+    i.observers = append(i.observers, o)
+}
+
+func (i *item) removeObserver(o observer) {
+    i.observerList = removeFromslice(i.observers, o)
+}
+
+func (i *item) notifyObservers() {
+    for _, observer := range i.observers {
+        observer.update(i.name)
+    }
+}
+
+// observer.go
+type observer interface {
+    update(string)
+}
+
+// listener.go implements observer
+type listener struct {
+    id string
+}
+
+func (l *listener) update(eventMsg string) {
+    fmt.Printf("Listener %s received event %s\n", l.id, eventMsg)
+}
+```
 
 

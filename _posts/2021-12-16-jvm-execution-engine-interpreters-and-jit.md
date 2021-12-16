@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-16 14:33:00 -0500
 categories: [Sytem]
-tags: [JIT, JVM]
+tags: [JIT, JVM, Java]
 ---
 
 Common compiled languages such as C++ usually compile the code directly into machine code that the CPU understands to run. On the other hand, to achieve the "compile once, run everywhere" feature, Java divides the compilation process into two parts to execute.
