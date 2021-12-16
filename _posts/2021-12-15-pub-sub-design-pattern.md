@@ -147,23 +147,23 @@ type event struct {
     name         string
 }
 
-func newEvent(name string) *item {
-    return &item{
+func newEvent(name string) *event {
+    return &event{
         name: name,
     }
 }
 
-func (i *item) registerObserver(o observer) {
-    i.observers = append(i.observers, o)
+func (e *event) registerObserver(o observer) {
+    i.observers = append(e.observers, o)
 }
 
-func (i *item) removeObserver(o observer) {
-    i.observerList = removeFromslice(i.observers, o)
+func (e *event) removeObserver(o observer) {
+    i.observerList = removeFromslice(e.observers, o)
 }
 
-func (i *item) notifyObservers() {
-    for _, observer := range i.observers {
-        observer.update(i.name)
+func (e *event) notifyObservers() {
+    for _, observer := range e.observers {
+        observer.update(e.name)
     }
 }
 
