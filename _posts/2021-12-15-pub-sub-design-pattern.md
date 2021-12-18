@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-15 21:48:00 -0500
 categories: [Software]
-tags: [design pattern]
+tags: [design pattern, Java, Go]
 render_with_liquid: false
 ---
 

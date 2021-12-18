@@ -1,5 +1,5 @@
 ---
-title: How to design a distributed key-value storage system?
+title: How to design a key-value storage system?
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
