@@ -1,5 +1,5 @@
 ---
-title: Logging system
+title: Logging framework
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
