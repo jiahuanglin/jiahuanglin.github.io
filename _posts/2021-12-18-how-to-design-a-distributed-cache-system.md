@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-18 01:45:00 -0500
 categories: [Sytem]
-tags: [system design, key-value store]
+tags: [system design, cache system]
 ---
 
 > The following are my notes from reading G.K's system design book
