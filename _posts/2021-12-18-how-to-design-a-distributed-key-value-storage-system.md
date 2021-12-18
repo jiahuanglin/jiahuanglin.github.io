@@ -8,7 +8,7 @@ categories: [Sytem]
 tags: [system design, key-value store]
 ---
 
-> The following are my notes for reading system design book from Groks King
+> The following are my notes from reading G.K's system design book
 
 Let's first condier a easier question: how to design a simple key-value storage system on a single machine?
 
@@ -17,8 +17,8 @@ The most straightforward way is to use a hash table to store key-value pairs, wh
 
 However, the drawbacks are also evident. Using hash tables usually means storing everything in memory, which may not be possible when the data set is large. There are two standard solutions.
 
-Compress our data. This should be the first thing to consider, and there are often many things we can compress. For example, we can store references instead of the actual data. We can also use float32 instead of float64. Also, it is valid to use a different data representation like bit arrays (integers) or vectors.
-Storage on disk. If it is impossible to put everything in memory, you can store some data on a disk, which means we can think of this system as a caching system to optimize it further: we keep the frequently accessed data in memory and the rest on disk.
+1. `Compress our data.` This should be the first thing to consider, and there are often many things we can compress. For example, we can store references instead of the actual data. We can also use float32 instead of float64. Also, it is valid to use a different data representation like bit arrays (integers) or vectors.
+2. `Storage on disk.` If it is impossible to put everything in memory, you can store some data on a disk, which means we can think of this system as a caching system to optimize it further: we keep the frequently accessed data in memory and the rest on disk.
 
 ## Distributed key-value store
 The exciting part is the scaling of key-value stores to multiple machines. 
