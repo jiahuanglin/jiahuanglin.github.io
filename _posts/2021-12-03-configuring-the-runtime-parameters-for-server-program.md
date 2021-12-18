@@ -3,7 +3,7 @@ title: Configuring the runtime parameters for server program
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2021-12-14 20:55:00 -0500
+date: 2021-12-03 20:55:00 -0500
 categories: [Software]
 tags: [server]
 ---

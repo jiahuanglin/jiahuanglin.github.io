@@ -3,7 +3,7 @@ title: How to design a key-value storage system?
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2021-12-18 01:09:00 -0500
+date: 2021-12-14 01:09:00 -0500
 categories: [Sytem]
 tags: [system design, key-value store]
 ---
