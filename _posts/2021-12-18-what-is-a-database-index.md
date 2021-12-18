@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2021-12-18 00:49:00 -0500
-categories: [Sytem, Data Structure]
+categories: [Data Structure]
 tags: [database]
 ---
 
