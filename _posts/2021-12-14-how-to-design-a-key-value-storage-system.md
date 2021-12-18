@@ -51,7 +51,7 @@ The other method is to commit the log. Each node machine keeps a commit log of e
 
 The last method is to resolve conflicts in reads. Suppose the coordinator can request all three machines when the requested resources are located in M1, M2 and M3. If the coordinator sees the data is different, coordinator can resolve the conflict instantly.
 
-### Read throughput
-In this article, I also want to mention read throughput briefly. Typically, key-value storage systems should support a large number of reading requests. So, what methods can we apply to increase read throughput?
+### `Read throughput`
+Typically, key-value storage systems should support a large number of reading requests. So, what methods can we apply to increase read throughput?
 
 Utilizing memory is a common approach to improve read throughput. If the data is stored on a disk in each node machine, we can move some of it to memory. The more common idea is to use caching.
