@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-18 11:12:00 -0500
 categories: [Software]
-tags: [design pattern, Java, Go]
+tags: [design pattern, Java, Go, C++]
 ---
 
 > The decorator pattern is a way to dynamically add functionality to an instance of an object at runtime.
@@ -135,4 +135,9 @@ func main() {
 
     notifierSmsEmail.notify()
 }
+```
+
+Following is a C++ example of the `decorator pattern`:
+```c++
+
 ```

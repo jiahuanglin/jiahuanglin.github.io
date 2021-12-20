@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-15 21:48:00 -0500
 categories: [Software]
-tags: [design pattern, Java, Go]
+tags: [design pattern, Java, Go, C++]
 render_with_liquid: false
 ---
 
@@ -130,7 +130,7 @@ public class WorkflowManager {
 ```
 
 ## Appendix
-Golang implementation of Pub-Sub pattern:
+Following is a Golang implementation of `Pub-Sub pattern`:
 ```go
 // subject.go
 type subject interface {
@@ -181,3 +181,8 @@ func (l *listener) update(eventMsg string) {
 ```
 
 
+
+Following is a C++ example of the `Pub-Sub pattern`:
+```c++
+
+```

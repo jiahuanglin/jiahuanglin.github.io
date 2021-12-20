@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-19 00:01:00 -0500
 categories: [Software]
-tags: [design pattern, Java, Go]
+tags: [design pattern, Java, Go, C++]
 ---
 
 > The proxy pattern is a structural design pattern that allows you to provide a substitute for an object or its placeholder. Proxies control access to the original object and allow some processing before and after the request is submitted to the object.
