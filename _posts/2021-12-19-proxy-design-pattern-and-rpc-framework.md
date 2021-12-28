@@ -45,10 +45,92 @@ public class ServerProxy extends Server {
     }
 }
 ```
+We can tell the drawbacks of static proxy (code above): we need to reimplement all the methods in the original class in the proxy class. Say there are over 100 classes to be proxied, then we need to make over 100 corresponding proxy classes. In addition, the code in each proxy class is a bit like boilerplate code, which adds unnecessary code maintainance costs.
 
+Apparently, a RPC framework cannot know the original class beforehand as the framework assumes no knowledge of the client(customer) class. So how can we solve this problem?
 
 ### Dynamic proxy
+We can use dynamic proxies to solve this problem. Instead of writing a proxy class for each original class, we dynamically create a proxy class for the original class at runtime and then replace the original class with the proxy class in the framework.
 
+Note that dynamic proxy relies on Java's reflection feature, namely the two core classes in the java.lang.reflect package: the `InvocationHandler interface` and the `Proxy class`.
+
+```java
+public interface InvocationHandler {
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
+
+}
+
+public class Proxy {
+    // ...
+    public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h) {
+
+        Objects.requireNonNull(h);
+
+        Class<?> caller = System.getSecurityManager() == null ? null : Reflection.getCallerClass();
+
+        Constructor<?> cons = getProxyConstructor(caller, loader, interfaces);
+
+        return newProxyInstance(caller, cons, h);
+    }
+}
+```
+
+Each dynamic proxy object must provide an implementation class of the `InvocationHandler interface`, with only one `invoke()` method. When using a proxy object to invoke a method, the proxy object will eventually forward the method call to the `invoke()` method to execute the specific logic.
+
+The `Proxy` class is actually a factory class for dynamically creating proxy classes. It provides static method `newProxyInstance()` for dynamically generating the proxy classes.
+
+A working example utilizing dynamic proxy will be like the following:
+```java
+public interface LoggingService {
+
+    void emit(Event event);
+
+}
+
+public class LoggingServiceImpl implements LoggingService {
+
+    @Override
+    public void emit(Event event) {
+        Timestamp timestamp = ...;
+        System.out.println(timestamp.toString() + event.toString());
+    }
+}
+
+public class LoggingServiceInvocationHandler implements InvocationHandler {
+
+    private Object proxiedObject; 
+    
+    public LoggingServiceInvocationHandler(Object proxiedObject) { 
+        this.proxiedObject = proxiedObject; 
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("start logging");
+        Object result = method.invoke(proxiedObject, args); 
+        System.out.println("emitted logging");
+        return result;
+    }
+}
+
+public class LoggingProxyFactory {
+
+    private Object target;
+
+    public LoggingProxyFactory(Object target) {
+        this.target = target;
+    }
+
+    public Object getProxyInstance(Object proxiedObject) {
+        LoggingServiceInvocationHandler handler = new LoggingServiceInvocationHandler(proxiedObject);
+        return Proxy.newProxyInstance(
+                target.getClass().getClassLoader(),
+                target.getClass().getInterfaces(),
+                handler);
+    }
+}
+```
 
 ### RPC Framework
 
