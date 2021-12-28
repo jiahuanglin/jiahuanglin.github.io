@@ -10,7 +10,7 @@ tags: [design pattern, server, Java, Go]
 
 > The proxy pattern is a structural design pattern that allows you to provide a substitute for an object or its placeholder. Proxies control access to the original object and allow some processing before and after the request is submitted to the object.
 
-### Static proxy
+## Static proxy
 ```java
 public class ServerLoadBalancer {
 
@@ -49,7 +49,7 @@ We can tell the drawbacks of static proxy (code above): we need to reimplement a
 
 Apparently, a RPC framework cannot know the original class beforehand as the framework assumes no knowledge of the client(customer) class. So how can we solve this problem?
 
-### Dynamic proxy
+## Dynamic proxy
 We can use dynamic proxies to solve this problem. Instead of writing a proxy class for each original class, we dynamically create a proxy class for the original class at runtime and then replace the original class with the proxy class in the framework.
 
 Note that dynamic proxy relies on Java's reflection feature, namely the two core classes in the java.lang.reflect package: the `InvocationHandler interface` and the `Proxy class`.
@@ -132,7 +132,117 @@ public class LoggingProxyFactory {
 }
 ```
 
-### RPC Framework
+## RPC Framework
+```java
+public class RpcProtocol<T> implements Serializable {
+    private RpcHeader header;
+    private T body;
+}
+
+public class RpcRequest implements Serializable {
+    private String serviceVersion;
+    private String className;
+    private String methodName;
+    private Object[] params;
+    private Class<?>[] parameterTypes;
+}
+
+public class RpcResponse implements Serializable {
+    private Object data;
+    private String msg;
+}
+
+public class RpcFuture<T> {
+    private Promise<T> promise;
+    private long timeout;
+}
+
+public class RequestQueue {
+    private Queue<RpcRequest> queue;
+
+    public RequestQueue() {
+        queue = new ConcurrentLinkedQueue<>();
+    }
+
+    public void hasRequest() {
+        return queue.size() > 0;
+    }
+
+    public void addRequest() {
+        // ...
+    }
+
+    public void popRequest() {
+        // ...
+    }
+}
+
+public class RpcExecutor implements Runnable {
+    //...
+
+    public void start(RequestQueue queue) {
+        while (queue.hasRequest()) {
+            // ...
+        }
+
+    }
+}
+
+
+public class RpcInvocationHandler implements InvocationHandler {
+
+    private RequestQueue queue;
+    private RpcExecutor executor;
+    private String serviceVersion;
+    private long timeout;
+    
+    public RpcInvocationHandler(String serviceVersion, long timeout) { 
+        executor = new RpcExecutor();
+        queue = new RequestQueue();
+        this.serviceVersion = serviceVersion;
+        this.timeout = timeout;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
+        MsgHeader header = new MsgHeader();
+        // header.setMagic(...);
+        // ...
+        protocol.setHeader(header);
+
+        RpcRequest request = new RpcRequest();
+        request.setServiceVersion(this.serviceVersion);
+        request.setClassName(method.getDeclaringClass().getName());
+        request.setMethodName(method.getName());
+        request.setParameterTypes(method.getParameterTypes());
+        request.setParams(args);
+        protocol.setBody(request);
+
+        RpcFuture<RpcResponse> future = new RpcFuture<>(new DefaultPromise<>(new DefaultEventLoop()), timeout);
+        queue.addRequest(protocol);
+
+        return future.getPromise().get(future.getTimeout(), TimeUnit.MILLISECONDS).getData();
+    }
+}
+
+public class LoggingProxyFactory {
+
+    private Object target;
+
+    public LoggingProxyFactory(Object target) {
+        this.target = target;
+    }
+
+    public Object getProxyInstance(Object proxiedObject) {
+        LoggingServiceInvocationHandler handler = new LoggingServiceInvocationHandler(proxiedObject);
+        return Proxy.newProxyInstance(
+                target.getClass().getClassLoader(),
+                target.getClass().getInterfaces(),
+                handler);
+    }
+}
+```
 
 
 ```go

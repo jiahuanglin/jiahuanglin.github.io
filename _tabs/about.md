@@ -8,6 +8,6 @@ Hi there, welcome to my little writing place!
 
 My name is Jacob. I am a software engineer in AWS working on machine learning compilers.
 
-> You have to work very hard to look effortless.
+> What goes around comes around.
 
-> "出来混都是要还的"
+> "出来混都是要还的".
