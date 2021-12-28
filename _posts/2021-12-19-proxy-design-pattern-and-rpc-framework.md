@@ -3,12 +3,55 @@ title: Proxy design pattern and RPC framework
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2021-12-19 00:01:00 -0500
+date: 2021-12-28 00:01:00 -0500
 categories: [Software]
-tags: [design pattern, Java, Go, C++]
+tags: [design pattern, server, Java, Go]
 ---
 
 > The proxy pattern is a structural design pattern that allows you to provide a substitute for an object or its placeholder. Proxies control access to the original object and allow some processing before and after the request is submitted to the object.
+
+### Static proxy
+```java
+public class ServerLoadBalancer {
+
+    public Server find(Context context) {
+        // return the least traffic server
+    }
+
+}
+
+public class Server {
+
+    public Response serve(Request request) {
+        // ...
+    }
+}
+
+public class ServerProxy extends Server {
+
+    private ServerLoadBalancer loadBalancer;
+
+    // ...
+    
+    public Response serve(Request request) {
+
+        /* Do something before routing request to actual server
+           The 'something' can be like network I/O, load balancing, service discovery etc.
+        */
+        Context context = ...
+        Server server = loadBalancer.find(context);
+
+        server.serve(request)
+    }
+}
+```
+
+
+### Dynamic proxy
+
+
+### RPC Framework
+
 
 ```go
 // server.go
