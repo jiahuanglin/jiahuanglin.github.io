@@ -244,7 +244,7 @@ public class LoggingProxyFactory {
 }
 ```
 
-
+## Appendix
 ```go
 // server.go
 type server interface {
