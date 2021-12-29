@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-28 00:01:00 -0500
 categories: [Software]
-tags: [design pattern, server, Java, Go]
+tags: [design pattern, server, Java, Go, C++]
 ---
 
 > The proxy pattern is a structural design pattern that allows you to provide a substitute for an object or its placeholder. Proxies control access to the original object and allow some processing before and after the request is submitted to the object.
@@ -245,6 +245,7 @@ public class LoggingProxyFactory {
 ```
 
 ## Appendix
+Golang implementation of proxy pattern:
 ```go
 // server.go
 type server interface {
@@ -299,4 +300,50 @@ func (d *application) handleRequest(url, method string) (int, string) {
         return 201, "User Created"
     }
     return 404, "Not Found"
+```
+
+C++ implementation of proxy pattern:
+```cpp
+// server interface
+class Server {
+ public:
+  virtual int HandleRequest() const = 0;
+};
+
+
+class MyServer : public Server {
+ public:
+  int HandleRequest() const override {
+    // ...
+    return 1;
+  }
+};
+
+
+class Proxy : public Server {
+
+ private:
+  MyServer *proxied_;
+
+ public:
+  Proxy(MyServer *proxied) : proxied_(new MyServer(*proxied)) {
+  }
+
+  ~Proxy() {
+    delete proxied_;
+  }
+
+  void Request() const override {
+    // ...
+    this->proxied_->HandleRequest();
+    // ...
+  }
+};
+
+
+void Demo(const Server &server) {
+  // ...
+  server.HandleRequest();
+  // ...
+}
 ```

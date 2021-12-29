@@ -140,4 +140,47 @@ func main() {
 Following is a C++ example of the `decorator pattern`:
 ```c++
 
+class Notifier {
+ public:
+  virtual ~Notifier() {}
+  virtual bool Notify() const = 0;
+};
+
+
+class Decorator : public Notifier {
+ protected:
+  Notifier* notifier_;
+
+ public:
+  Decorator(Notifier* notifier) : notifier_(notifier) {
+  }
+
+  bool Notify() const override {
+    return this->component_->Notify();
+  }
+};
+
+
+class SmsNotifier : public Decorator {
+ public:
+  SmsNotifier(Notifier* notifier) : Decorator(notifier) {
+  }
+  bool Notify() const override {
+    // send SMS msg
+    Decorator::Notify();
+    return 1; 
+  }
+};
+
+
+class EmailNotifier : public Decorator {
+ public:
+  SmsNotifier(Notifier* notifier) : Decorator(notifier) {
+  }
+  bool Notify() const override {
+    // send email msg
+    Decorator::Notify();
+    return 1; 
+  }
+};
 ```
