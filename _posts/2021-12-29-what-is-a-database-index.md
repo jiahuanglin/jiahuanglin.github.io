@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-30 22:49:00 -0500
 categories: [Data Structure]
-tags: [database]
+tags: [database, B+ tree]
 ---
 
 > Index is a data structure to improve the speed of queries.
@@ -34,3 +34,29 @@ However, as more records are inserted into the B+ tree index, one page (16K) can
 ![B+ tree demo](/assets/img/posts/what-is-a-database-index/b+_tree.jpeg)
 
 As we can see, in the B+ tree index above, if we want to look up a record with index key value 5, we first look up the root node and find the key-value pair (5, address), which means that records less or equal to 5 are in the next level of leaf nodes pointed to by the address. Then we can find the leftmost leaf node according to the address of the next level, and we can find the record with index key value 5 in the leaf node according to the binary lookup.
+
+## Efficiency
+
+What is the theoretical maximum number of rows that a B+ tree index of height 2 can hold?
+
+In MySQL InnoDB storage engine, a page size is 16K, and let's say the key-value pair `userId` is of type LONG, then the root node can hold at most the following:
+
+> key-value pairs = 16K / key-value pair size (8+8) ≈ 1000
+
+Assuming again that the size of each record in the table is 500 bytes, then:
+
+> The maximum number of records that can be stored in a leaf node is = 16K / size of each record ≈ 32
+
+In summary, the maximum number of records that can be stored in a B+ tree index with a tree height of 2 is:
+
+> Total number of records = 1000 * 32 = 32,000
+
+In other words, after sorting 35,200 records, the resulting B+ tree index has a height of 2. Searching for a record based on the index key in 32,000 records requires only 2 pages, a root and a leaf node, to locate the page where the record is located.
+
+Similarly, the maximum number of records that can be stored in a B+ tree index with a tree height of 3 is:
+
+> Total number of records = 1000 (root node) * 1000 (intermediate nodes) * 32 = 32,000,000
+
+We can conclude that:
+1. B+ tree indexes are typically 3 to 4 levels high, and a B+ tree of height 4 can hold about 5 billion records.
+2. Because of the low height of the B+ tree, queries are extremely efficient, and only 4 I/Os are needed to interpolate 5 billion records.
