@@ -139,8 +139,29 @@ for (i = 0; i < n; i += 4) {
 }
 ```
 
+## Loop interchage
+```c++
+// before interchage
+for (int j = 0; j < n; ++j) {
+  for (int i = 0; i < n; ++i) {
+    a[i][j] += 1;
+  }
+}
+
+// after interchage
+for (int i = 0; i < n; ++i) {
+  for (int j = 0; j < n; ++j) {
+    a[i][j] += 1;
+  }
+}
+```
+The benefit of loop interchange is reference locality.
+
 ## Loop parallelization
 
+## Strength reduction
+
+## Computation Hoisting
 
 
 ### Reference

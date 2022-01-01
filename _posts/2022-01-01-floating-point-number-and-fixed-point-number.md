@@ -3,7 +3,7 @@ title: Floating point number and fixed point number
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2022-01-01 20:26:00 -0500
+date: 2022-01-01 17:12:00 -0500
 categories: [Data Structure]
 tags: [number format]
 ---
