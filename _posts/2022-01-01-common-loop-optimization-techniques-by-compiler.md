@@ -27,7 +27,7 @@ Dominators can be organized as a tree
 Back edge is an edge from n to dominator d.
 
 ### Example
-![example cfg](_site/../../assets/img/posts/loop-optimization/dominator-back-edge-example.jpg)
+![example cfg](/assets/img/posts/loop-optimization/dominator-back-edge-example.jpg)
 
 In the above example, we have:
 
@@ -51,10 +51,70 @@ Algorithm to Find Natural Loops:
 2. Identify the back edges
 3. Find the natural loop associated with the back edge
 
+## Loop fusion & loop fission
+Both loop fusion and loop fisson make good uses of the reference locality property. Loop fusion combines two loops into one while loop fission seperates one loop into two.
+
+### Loop fusion
+```c++
+// before fusion
+int sum = 0;
+for (int i = 0; i < n; ++i) {
+ sum += a[i];
+ a[i] = sum;
+}
+for (int i = 0; i < n; ++i) {
+ b[i] += a[i];
+}
+
+// after fusion
+int sum = 0;
+for (int i = 0; i < n; ++i) {
+ sum += a[i];
+ a[i] = sum;
+ b[i] += a[i];
+}
+```
+
+### Loop fission
+```c++
+// before fission
+for (int i = 0; i < N; ++i) {
+  a[i] = e1;
+  b[i] = e2;
+}
+
+
+// after fission
+for (int i = 0; i < N; ++i) {
+  a[i] = e1;
+}
+for (int i = 0; i < N; ++i) {
+  b[i] = e2;
+}
+```
+
+
 ## Loop unrolling
+Loop unrolling re-writes the loop body and each iteration of rewritten loop will perform several iterations of old loop.
 
+```c++
+// before unrolling
+for (int i = 0; i < n; ++i) {
+  a[i] = b[i] * 7 + c[i] / 13;
+}
 
-## Loop fusion
+// after unrolling
+for (int i = 0; i < n % 3; ++i) {
+  a[i] = b[i] * 7 + c[i] / 13;
+}
+for (; i < n; i += 3) {
+  a[i] = b[i] * 7 + c[i] / 13;
+  a[i + 1] = b[i + 1] * 7 + c[i + 1] / 13;
+  a[i + 2] = b[i + 2] * 7 + c[i + 2] / 13;
+}
+```
+
+The benefit of loop unrolling is reducing branching penalty & end-of-loop-test costs.
 
 ## Loop tiling
 
