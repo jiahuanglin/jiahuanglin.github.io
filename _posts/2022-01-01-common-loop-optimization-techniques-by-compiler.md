@@ -1,9 +1,9 @@
 ---
-title: Common compiler optimization in loop
+title: Common loop optimization techniques by compiler
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2022-01-01 1:41:00 -0500
+date: 2022-01-01 14:41:00 -0500
 categories: [Sytem]
 tags: [compiler]
 ---
@@ -22,10 +22,29 @@ the start node to n goes through d
 Dominators can be organized as a tree
   - a ->b in the dominator tree iff a immediately dominates b
 
+
+### Back edge
+Back edge is an edge from n to dominator d.
+
+### Example
+![example cfg](_site/../../assets/img/posts/loop-optimization/dominator-back-edge-example.jpg)
+
+In the above example, we have:
+
+- a dominates a,b,c,d,e,f,g,h 
+- b dominates b,c,d,e,f,g,h 
+- c dominates c,e 
+- d dominates d 
+- e dominates e 
+- f dominates f,g,h 
+- g dominates g,h 
+- h dominates h 
+- back-edges? g→b, h→a
+
+
 ### Natural Loops
 The natural loop of a back edge is the `smallest set of nodes` that includes the head and tail of the `back edge`, and has no predecessors outside the set, except for the predecessors of the header.
   - Single entry-point: header that dominates all nodes in the loop
-  - Back edge: an edge from n to a dominator d
 
 Algorithm to Find Natural Loops:
 1. Find the dominator relations in a flow graph
@@ -33,6 +52,7 @@ Algorithm to Find Natural Loops:
 3. Find the natural loop associated with the back edge
 
 ## Loop unrolling
+
 
 ## Loop fusion
 
