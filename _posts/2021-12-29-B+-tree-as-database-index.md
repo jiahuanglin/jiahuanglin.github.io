@@ -1,5 +1,5 @@
 ---
-title: What is a database index
+title: B+ tree as database index
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
@@ -7,6 +7,8 @@ date: 2021-12-30 22:49:00 -0500
 categories: [Data Structure]
 tags: [database, B+ tree]
 ---
+
+## What is a database index
 
 > Index is a data structure to improve the speed of queries.
 
