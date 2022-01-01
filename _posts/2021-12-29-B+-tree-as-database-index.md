@@ -60,8 +60,80 @@ Similarly, the maximum number of records that can be stored in a B+ tree index w
 
 > Total number of records = 1000 (root node) * 1000 (intermediate nodes) * 32 = 32,000,000
 
-
-
 We can conclude that:
 1. **B+ tree indexes are typically 3 to 4 levels high, and a B+ tree of height 4 can hold about 5 billion records.**
 2. **Because of the low height of the B+ tree, queries are extremely efficient, and only 4 I/Os are needed to interpolate 5 billion records.**
+
+
+## Implementation
+```c++
+namespace Data {
+
+struct Record {
+  //...
+}
+
+}
+
+
+namespace Index {
+
+struct Address {
+  void* blockAddress;
+  size_t offset;
+}
+
+
+class Node
+{
+private:
+  Address *pointers;      // A pointer to an array of struct {void *blockAddress, short int offset} containing other nodes in disk.
+  float *keys;            // Pointer to an array of keys in this node.
+  int numKeys;            // Current number of keys in this node.
+  bool isLeaf;            // Whether this node is a leaf node.
+  friend class BPlusTree; // Friend variable to access this class' private variables.
+
+public:
+  Node(int maxKeys); // Takes in max keys in a node.
+};
+
+// The B+ Tree itself.
+class BPlusTree
+{
+private:
+  MemoryPool *disk;     // Pointer to a memory pool for data blocks.
+  MemoryPool *index;    // Pointer to a memory pool in disk for index.
+  Node *root;           // Pointer to the main memory root (if it's loaded).
+  void *rootAddress;    // Pointer to root's address on disk.
+  int maxKeys;          // Maximum keys in a node.
+  int levels;           // Number of levels in this B+ Tree.
+  int numNodes;         // Number of nodes in this B+ Tree.
+  std::size_t nodeSize; // Size of a node = Size of block.
+
+  // Updates the parent node to point at both child nodes, and adds a parent node if needed.
+  void insertInternal(float key, Node *cursorDiskAddress, Node *childDiskAddress);
+
+  // Helper function for deleting records.
+  void removeInternal(float key, Node *cursorDiskAddress, Node *childDiskAddress);
+
+  // Finds the direct parent of a node in the B+ Tree.
+  // Takes in root and a node to find parent for, returns parent's disk address.
+  Node *findParent(Node *root, Node *node, float lowerBoundKey);
+
+public:
+  // Constructor, takes in block size to determine max keys/pointers in a node.
+  BPlusTree(std::size_t blockSize, MemoryPool *disk, MemoryPool *index);
+
+  // Search for keys corresponding to a range in the B+ Tree given a lower and upper bound. Returns a list of matching Records.
+  void search(float lowerBoundKey, float upperBoundKey);
+
+  // Inserts a record into the B+ Tree.
+  void insert(Address address, float key);
+
+  // Remove a range of records from the disk (and B+ Tree).
+  // Accepts a key to delete.
+  int remove(float key);
+};
+
+}
+```
