@@ -10,7 +10,7 @@ tags: [JIT, JVM, Java]
 
 Common compiled languages such as C++ usually compile the code directly into machine code that the CPU understands to run. On the other hand, to achieve the "compile once, run everywhere" feature, Java divides the compilation process into two parts to execute.
 
-### How JVM executes JAVA code
+## How JVM executes JAVA code
 Usually, the JVM contains two core modules: the executor and the memory manager, where the executor is specifically used to execute the bytecode. The most widely used virtual machine is Hotspot, whose executor includes an interpreter and a JIT compiler. 
 
 Before interpreter can start executing Java code, the first step is to compile the source code into byte code through `javac`. This process includes lexical analysis, syntax analysis, semantic analysis. Next, the interpreter directly interpretes bytecode and executes line by line without compilation. In the meantime, the virtual machine collects meta-data regarding the program's execution. The compiler (JIT) can gradually come into play based on this data. It will perform backstage compilation - compiling the bytecode into machine code. But JIT will only compile code identified as a hotspot by the JVM.
@@ -75,6 +75,17 @@ We can take a look at the bytecode of the `absDifference()` method. The number 0
 So how does the interpreter work? The interpreter is in fact a [Stack Machine](https://en.wikipedia.org/wiki/Stack_machine) that executes bytecode in stack order according to the semantics of the bytecode. Take the above substraction for example. When interpreter executes a substraction, it will first push two operands into stack, in our case is 
 `iload_0` and `iload_1`. Then it exeutes `isub` which will pop operand 0 and operand 1 out of stack and perform the substraction. Then it executes `istore_2` which pushes the substraction result into the stack.
 
-### JIT
+## JIT
+There are two core mechanisms that JIT compilers rely on, which are:
 
+1. **Request writable and executable memory areas to ensure that executable machine code can be generated during runtime.**
+2. **Profiling Guided Optimization, which allows the JIT compiler to achieve runtime performance that exceeds that of static compilers.**
 
+Specifically, the first mechanism is to request a memory block with both write and execute permissions. Then, compile the Java method and write the compiled machine code to the requested memory block. When the original Java method is called, instead of interpreting the method, JIT directly call the executable memory block.
+
+The second mechanism involves runtime profiling. Basically JVM uses two counters to profile, the Invocation Counter and the Back Edge Counter.
+
+1. Invocation Counter: used to count the number of times a method has been called
+2. Back Edge Counter: used to count the number of times the loop code is executed in a method, and the instruction that jumps backward in the bytecode is called `Back Edge`.
+
+JVM will trigger JIT compilation whenever the two counter goes above some pre-set threshold. Those `over threshold code` is considered `HotSpot`.
