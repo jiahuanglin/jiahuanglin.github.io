@@ -104,10 +104,7 @@ for (int i = 0; i < n; ++i) {
 }
 
 // after unrolling
-for (int i = 0; i < n % 3; ++i) {
-  a[i] = b[i] * 7 + c[i] / 13;
-}
-for (; i < n; i += 3) {
+for (int i = 0; i < n; i+=3) {
   a[i] = b[i] * 7 + c[i] / 13;
   a[i + 1] = b[i + 1] * 7 + c[i + 1] / 13;
   a[i + 2] = b[i + 2] * 7 + c[i + 2] / 13;
@@ -117,10 +114,35 @@ for (; i < n; i += 3) {
 The benefit of loop unrolling is reducing branching penalty & end-of-loop-test costs.
 
 ## Loop tiling
+Loop tiling partitions a loop's iteration space into smaller chunks or blocks, so as to help ensure data used in a loop stays in the cache until it is reused.
+
+```c++
+// before tiling
+for (i = 0; i < n; i++) {
+  c[i] = 0;
+  for (j = 0; j < n; j++) {
+    c[i] = c[i] + a[i][j] * b[j];
+  }
+}
+
+// after tiling
+for (i = 0; i < n; i += 4) {
+  c[i] = 0;
+  c[i + 1] = 0;
+  for (j = 0; j < n; j += 4) {
+    for (x = i; x < min(i + 4, n); x++) {
+      for (y = j; y < min(j + 4, n); y++) {
+        c[x] = c[x] + a[x][y] * b[y];
+      }
+    }
+  }
+}
+```
 
 ## Loop parallelization
 
 
 ### Reference
 [Wiki: Control Flow Graph](https://en.wikipedia.org/wiki/Control-flow_graph)\
+[Wiki: Loop Tiling](https://en.wikipedia.org/wiki/Loop_nest_optimization)\
 [CSC D70: Compiler Optimization LICM (Loop Invariant Code Motion)](http://www.cs.toronto.edu/~pekhimenko/courses/cscd70-w18/docs/Lecture%205%20[LICM%20and%20Strength%20Reduction]%2002.08.2018.pdf)
