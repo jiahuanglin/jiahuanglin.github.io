@@ -17,9 +17,10 @@ Every book has its table of contents. Similarly, an index is the "table of conte
 ## Why tree index
 Before answering this question, let's consider implementing an index with common data structures that supports fast look-ups like `hashmap`, `array` and `binary search tree`.
 
-For `hasmap`, every insertion & deletion will just be constant time, query by key will also be constant time, but query by the key range from `[KEY_i, KEY_j]` will require a linear look-up time. 
+For `hashmap`, every insertion & deletion will just be constant time, query by key will also be constant time, but query by the key range from `[KEY_i, KEY_j]` will require a linear look-up time. 
 
 The `array` approach will have a amortized `O(1)` insertion time (append to tail). And both query by key and query by range will be `O(1)` if we map the table's key into array index. However, the problem with `array` is that it doesn't support dynamic insertion: insertion to the sorted keys will require linear time. Therefore, ordered array indexes are only suitable for static storage engines, i.e. storing data that will never be modified again.
+
 `Binary search tree` will have `O(logN)` query complexity. To maintain `O(logN)` query complexity, one needs to keep the tree as a balanced binary tree. The update time complexity is also `O(logN)`. Assuming the ratio of query operations over update operations is 1:1, then a binary search tree seems like the optimal choice among the 3. However, most database stores use n-ary trees instead of binary trees in practice. The reason is that the `indexes` is stored in the disk, and each disk seek operation is costly. Using a binary tree will lead to a `much bigger height` for a large number of nodes than an N-ary tree when N is significant, which gives rise to a `higher number of seek operations` considering the height difference.
 
 ## B+ tree
@@ -59,6 +60,8 @@ Similarly, the maximum number of records that can be stored in a B+ tree index w
 
 > Total number of records = 1000 (root node) * 1000 (intermediate nodes) * 32 = 32,000,000
 
+
+
 We can conclude that:
-1. B+ tree indexes are typically 3 to 4 levels high, and a B+ tree of height 4 can hold about 5 billion records.
-2. Because of the low height of the B+ tree, queries are extremely efficient, and only 4 I/Os are needed to interpolate 5 billion records.
+1. **B+ tree indexes are typically 3 to 4 levels high, and a B+ tree of height 4 can hold about 5 billion records.**
+2. **Because of the low height of the B+ tree, queries are extremely efficient, and only 4 I/Os are needed to interpolate 5 billion records.**
