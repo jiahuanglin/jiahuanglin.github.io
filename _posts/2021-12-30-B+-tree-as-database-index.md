@@ -80,7 +80,7 @@ namespace Index {
 
 struct Address {
   void* blockAddress;
-  size_t offset;
+  std::size_t offset;
 }
 
 
@@ -91,13 +91,13 @@ private:
   float *keys;            // Pointer to an array of keys in this node.
   int numKeys;            // Current number of keys in this node.
   bool isLeaf;            // Whether this node is a leaf node.
-  friend class BPlusTree; // Friend variable to access this class' private variables.
+  friend class BPlusTree; // To access this class' private variables.
 
 public:
   Node(int maxKeys); // Takes in max keys in a node.
 };
 
-// The B+ Tree itself.
+
 class BPlusTree
 {
 private:
