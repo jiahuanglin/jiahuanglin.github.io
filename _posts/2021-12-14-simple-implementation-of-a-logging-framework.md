@@ -1,5 +1,5 @@
 ---
-title: Logging framework
+title: Simple implementation of a logging framework
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin

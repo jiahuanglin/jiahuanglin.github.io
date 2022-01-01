@@ -56,7 +56,10 @@ namespace {
     VectorizationPass() : LoopPass(ID) {}
 
     virtual bool runOnLoop(Loop* L, LPPassManager &LPM) {
+      
     }
+  }
+}
 ```
 
 

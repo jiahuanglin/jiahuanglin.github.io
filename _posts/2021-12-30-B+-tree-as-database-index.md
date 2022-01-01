@@ -67,7 +67,7 @@ We can conclude that:
 
 ## Implementation
 ```c++
-namespace Data {
+namespace data {
 
 struct Record {
   //...
@@ -76,7 +76,7 @@ struct Record {
 }
 
 
-namespace Index {
+namespace index {
 
 struct Address {
   void* blockAddress;

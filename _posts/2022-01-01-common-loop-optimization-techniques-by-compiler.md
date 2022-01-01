@@ -3,7 +3,7 @@ title: Common loop optimization techniques by compiler
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2022-01-01 14:41:00 -0500
+date: 2022-01-01 15:41:00 -0500
 categories: [Sytem]
 tags: [compiler]
 ---
@@ -59,19 +59,19 @@ Both loop fusion and loop fisson make good uses of the reference locality proper
 // before fusion
 int sum = 0;
 for (int i = 0; i < n; ++i) {
- sum += a[i];
- a[i] = sum;
+  sum += a[i];
+  a[i] = sum;
 }
 for (int i = 0; i < n; ++i) {
- b[i] += a[i];
+  b[i] += a[i];
 }
 
 // after fusion
 int sum = 0;
 for (int i = 0; i < n; ++i) {
- sum += a[i];
- a[i] = sum;
- b[i] += a[i];
+  sum += a[i];
+  a[i] = sum;
+  b[i] += a[i];
 }
 ```
 
@@ -140,6 +140,7 @@ for (i = 0; i < n; i += 4) {
 ```
 
 ## Loop parallelization
+
 
 
 ### Reference
