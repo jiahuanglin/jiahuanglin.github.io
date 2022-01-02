@@ -20,7 +20,7 @@ Node d `dominates` node n in a graph (d `dom` n) if every path from
 the start node to n goes through d
 
 Dominators can be organized as a tree
-  - a ->b in the dominator tree iff a immediately dominates b
+  - a -> b in the dominator tree iff a immediately dominates b
 
 
 ### Back edge
