@@ -1,5 +1,5 @@
 ---
-title: Floating point number and fixed point number
+title: Floating point numbers and fixed point numbers
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
@@ -10,7 +10,7 @@ tags: [number format]
 
 How can we represent numbers with a point in computer?
 
-## Fixed point number
+## Fixed point numbers
 We know that we can represent 32^2 different numbers with 32 bits, which gives us almost 4 billion distinct numbers. An intuitive idea for representing numbers with a point is to fix the point position. Namely, we use 4 bits to represent integers in decimal (0 to 9), so 32 bits would represent 8 such integers. Then we take the rightmost 2 integers as the fractional part, and fix the point right at that position. In this way, we can represent 100 million real numbers from 0 to 999999.99 in 32 bits.
 
 Such binary representation of point decimal is called **BCD (Binary-Coded Decimal)**. It is most often used in supermarkets and banks where we have decimals up to the cent position.
@@ -19,7 +19,7 @@ However, the drawback is clear:
 1. Waste of bits. With 32 bits we could represent 4 billion different numbers theoretically, but we can only represent 100 million numbers in BCD
 2. There is no way to represent huge numbers and tiny numbers simultaneously in this way. We can't let our computers deal only a small fixed range of numbers.
 
-## Floating point number
+## Floating point numbers
 ```math
 V = (-1)^s * M * (2)^E
 ```
