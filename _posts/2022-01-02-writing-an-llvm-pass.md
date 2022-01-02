@@ -70,7 +70,6 @@ Similar to function pass, we can register a customized loop pass which does all 
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/Analysis/LoopPass.h"
 #include "llvm/Analysis/ScalarEvolution.h"
-#include "llvm/IR/Value.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/LegacyPassManager.h"

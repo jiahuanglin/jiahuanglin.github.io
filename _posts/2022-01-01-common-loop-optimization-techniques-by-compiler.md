@@ -11,7 +11,7 @@ tags: [compiler]
 Before optimizing a loop, we need to first define a loop in the control flow graph. Note that each node in a control flow graph is a basic block.
 
 ## Identifying loops
-Cycles are not necessary loops. A `loop` is a `subset S of nodes` where:
+Cycles in the control flow graph are not necessary loops. A `loop` is a `subset S of nodes` where:
  - S is strongly connected. In other words, for any two nodes in S, there is a path from one to the other using only nodes in S
  - There is a distinguished header node *`h∈S`* such that there is no edge from a node outside S to *`S\{h}`*
 
@@ -39,7 +39,7 @@ In the above example, we have:
 - f dominates f,g,h 
 - g dominates g,h 
 - h dominates h 
-- back-edges? g→b, h→a
+- back-edges: g→b, h→a
 
 
 ### Natural Loops

@@ -73,6 +73,8 @@ public class DataInputStream extends InputStream {
 The purpose of the `decorator pattern` is to add additional functionalities to the original layer in a layering manner so that we can get the ultimate function we want by combining them.
 
 
+**Interesting note: Python directly integrated `decorator` as a language feature.**
+
 
 ### Appendix
 
@@ -171,7 +173,6 @@ class SmsNotifier : public Decorator {
     return 1; 
   }
 };
-
 
 class EmailNotifier : public Decorator {
  public:
