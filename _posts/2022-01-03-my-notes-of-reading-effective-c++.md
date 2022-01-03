@@ -11,9 +11,9 @@ tags: [C++]
 > Following is my note of reading effective c++ (this is an on-going post)
 
 # Copy all parts of an object
-In a mature object-oriented C++ system, there are only two ways of copying objects: copy constructors and assignment operators referred to as copy functions. Copy functions are compiler-generated functions by default (see Item 5: Functions that are silently declared and called by C++), and the default copy function does copy the object in its entirety. Still, sometimes we choose to overload the copy function. And that's where the problem is!
+In a mature object-oriented C++ system, there are only two ways of copying objects: `copy constructors` and `assignment operators` referred to as `copy` functions. Copy functions are compiler-generated functions by default, and the default copy function does copy the object in its entirety. Still, sometimes we choose to `overload` the copy function. And that's where the problem arises!
 
-A correct implementation of the copy function would look like this:
+A correct implementation of the `copy` function would look like this:
 ```c++
 class Customer{
   string name;
@@ -21,7 +21,7 @@ public:
   Customer(const Customer& rhs): name(rhs.name){}
   Customer& operator=(const Customer& rhs){
     name = rhs.name; // copy rhs's data
-    return *this; // see Item 10
+    return *this;
   }  
 };
 ```
@@ -36,7 +36,7 @@ public:
   Customer(const Customer& rhs): name(rhs.name){}
   Customer& operator=(const Customer& rhs){
     name = rhs.name; // copy rhs's data
-    return *this; // see Item 10
+    return *this;
   }  
 };
 ```
