@@ -119,8 +119,7 @@ public abstract class DataFile {
     this.filepath = filepath;
   }
 
-  public abstract void accept(DataParser parser);
-  public abstract void accept(DataTransformer transformer);
+  public abstract void accept(Visitor visitor);
 }
 
 public class CsvFile extends DataFile {
@@ -129,13 +128,8 @@ public class CsvFile extends DataFile {
   }
 
   @Override
-  public void accept(DataParser parser) {
-    parser.parse(this);
-  }
-
-  @Override
-  public void accept(DataTransformer transformer) {
-    transformer.transform(this);
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }
 
@@ -144,12 +138,22 @@ public class TextFile extends DataFile {
     super(filepath);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
   // ...
 }
 
 public class ImageFile extends DataFile {
   public ImageFile(String filepath) {
     super(filepath);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   // ...
@@ -161,23 +165,34 @@ public interface Visitor {
   public Dataset visit(ImageFile file);
 }
 
-public class DataParser {
+public class DataParser implements Visitor {
   // return a parsed dataset object
   public Dataset visit(CsvFile file) {
-    // ...
+    // ... parsing
   }
 
   public Dataset visit(TextFile file) {
-    // ...
+    // ... parsing
   }
 
   public Dataset visit(ImageFile file) {
-    // ...
+    // ... parsing
   }
 }
 
 public class DataTransformer {
-  // ...
+  // return a parsed dataset object
+  public Dataset visit(CsvFile file) {
+    // ... transform
+  }
+
+  public Dataset visit(TextFile file) {
+    // ... transform
+  }
+
+  public Dataset visit(ImageFile file) {
+    // ... transform
+  }
 }
 ```
 
@@ -260,7 +275,6 @@ func (v LogVisitor) Visit(fn VisitorFunc) error {
   )
 }
 ```
-
 
 
 
