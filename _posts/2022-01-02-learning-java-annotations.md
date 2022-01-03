@@ -3,7 +3,7 @@ title: Learning Java annotations
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2022-01-02 17:34:00 -0500
+date: 2022-01-02 22:34:00 -0500
 categories: [Software]
 tags: [Java, annotations]
 ---
@@ -58,6 +58,76 @@ Note that all annotations inherit from java.lang.annotation. The methods provide
 
 
 ## Use case
-Suppose we want to parse tables from relational database. The table might contain varies data format like `date`, `text meg`, `integer array`, `floating point numbers array` etc. Tables are user input, we don't know what exactly are there beforehand. 
+Suppose we want to parse tables from the relational database. The table might contain various data formats like `date`, `text meg`, `integer array`, `floating-point numbers array` etc. Tables are user input. Only user knows what formats are there in the tables and we don't know what format is there beforehand. This means that we need to let the user bind the correct format parsers to the columns of the data table, and call the parser at runtime based on the column.
+
+We can expose a parser registry class that holds a map from column name to parser class, or we can utilize annotations which is a neat solution for this scenerio:
+
+```java
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Processor {
+    Class<? extends Parser> value();
+}
+
+
+public interface Parser {
+  void setColumn(String column);
+  void parse(String[][] rows);
+}
+
+public class DateParser implements Parser {
+
+  private String columnName;
+
+  public DateParser(String columnName) {
+    this.columnName = columnName
+  }
+
+  // ...
+}
+
+public class IntArrayParser implements Parser {
+
+  private String columnName;
+
+  public IntArrayParser(String columnName) {
+    this.columnName = columnName
+  }
+
+  // ...
+}
+
+public abstract class Table {
+  // ...
+}
+
+public class TableLoader() {
+
+  private List<Parser> parsers = new ArrayList<Parser>();
+  
+  public void load(Table baseTable, String fileName) {
+    for (Field field : schemaClass.getDeclaredFields()) {
+      String columnName = field.getName();
+      if (field.isAnnotationPresent(Parser.class)) {
+          Class<? extends Parser> parserClass = field.getDeclaredAnnotation(Parser.class).value();
+          Parser parser = parserClass.getConstructor(String.class).newInstance(columnName);
+          // ... parse and other work
+      }
+    }
+
+    if (field.isAnnotationPresent(Bind.class)) {
+        Class<? extends Parser> parserClass = field.getDeclaredAnnotation(Bind.class).value();
+    }
+}
+
+
+// user code
+public class UserTable extends Table {
+  @Parser(DateParser.class) Long birthday;
+  @Parser(IntArrayParser.class) Integer[] account;
+}
+```
+
+
 
 
