@@ -101,12 +101,14 @@ public abstract class Table {
   // ...
 }
 
-public class TableLoader() {
+public class TableLoader {
 
-  private List<Parser> parsers = new ArrayList<Parser>();
+  public TableLoader() {
+    // ...
+  }
   
-  public void load(Table baseTable, String fileName) {
-    for (Field field : schemaClass.getDeclaredFields()) {
+  public void load(Class tableClass, String fileName) {
+    for (Field field : tableClass.getDeclaredFields()) {
       String columnName = field.getName();
       if (field.isAnnotationPresent(Parser.class)) {
           Class<? extends Parser> parserClass = field.getDeclaredAnnotation(Parser.class).value();
