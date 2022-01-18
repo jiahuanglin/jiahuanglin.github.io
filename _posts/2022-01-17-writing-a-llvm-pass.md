@@ -1,9 +1,9 @@
 ---
-title: Writing an LLVM pass
+title: Writing a LLVM pass
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2022-01-02 09:01:00 -0500
+date: 2022-01-17 09:01:00 -0500
 categories: [Sytem]
 tags: [compiler, LLVM]
 ---
@@ -348,13 +348,9 @@ static RegisterPass<VecotrizationPass> X("vectorization", "an auto-vec pass");
 ```
 
 
-## How passes are integrated into the LLVM source tree
-
-
-
-
 
 ### Reference
 [Writing An LLVM Pass](https://llvm.org/docs/WritingAnLLVMPass.html)\
 [LLVM Hello Word Pass](https://github.com/llvm/llvm-project/blob/main/llvm/lib/Transforms/Hello/Hello.cpp)\
 [LLVM Documentation](https://llvm.org/doxygen/)
+[LLVM Concepts](https://www.llvmpy.org/llvmpy-doc/dev/doc/llvm_concepts.html)
