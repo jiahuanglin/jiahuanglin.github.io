@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2021-12-18 01:45:00 -0500
-categories: [Sytem]
+categories: [System]
 tags: [system design, cache system]
 ---
 

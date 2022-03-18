@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2022-01-01 15:41:00 -0500
-categories: [Sytem]
+categories: [System]
 tags: [compiler]
 ---
 
