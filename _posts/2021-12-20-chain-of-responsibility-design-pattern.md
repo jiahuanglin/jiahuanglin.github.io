@@ -10,7 +10,7 @@ tags: [design pattern, Java, Go, C++]
 
 > The chain of responsibility design pattern
 
-In compiler backend development, we usually will have to run multiple passes on the intermediate representation. Those passes including optimization passes, lowering passes, scheudling passes and code gen passes. In addition, passes will follow some particular order, namely we always run optimization passes before scheduling and code gen passes. Inputs to the downstream passes usually will depend on the outputs of upstream passes with possibly some twisks.
+In compiler backend development, we usually will have to run multiple passes on the intermediate representation. Those passes including optimization passes, lowering passes, scheduling passes and code gen passes. In addition, passes will follow some particular order, namely we always run optimization passes before scheduling and code gen passes. Inputs to the downstream passes usually will depend on the outputs of upstream passes with possibly some twisks.
 
 ```java
 
