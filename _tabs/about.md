@@ -6,7 +6,7 @@ order: 4
 
 Hi there, welcome to my little writing place! 
 
-My name is Jacob. I am a software engineer in AWS working on machine learning compilers.
+My name is Jacob. I am a software engineer in Amazon
 
 > What goes around comes around.
 
