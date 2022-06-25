@@ -74,7 +74,7 @@ After getting the target file, we cannot execute the file yet. This is because t
 
 Linking merges many target files and outputs an executable file.
  
-```
+```Bash
 $ ld -static demo.o \
     /usr/lib/x86_64-linux-gnu/crt1.o \
     /usr/lib/x86_64-linux-gnu/crti.o \
