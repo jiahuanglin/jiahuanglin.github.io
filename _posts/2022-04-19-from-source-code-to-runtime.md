@@ -1,5 +1,5 @@
 ---
-title: From source code to binary
+title: From source code to runtime
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
@@ -41,7 +41,8 @@ Once we have the assembly file, we can use the assembler to assemble the assembl
 The output of this step is the binary object file (`ELF` file) for the corresponding platform, which contains the function symbols and the corresponding binary machine code.
 
 > We can use the `readelf` command to view the file information of an `ELF` file.
-```
+
+```Bash
 $ readelf -a demo.o
 ELF Header:
     Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
