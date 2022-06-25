@@ -41,6 +41,110 @@ Code review also gives more people the opportunity to make useful suggestions; a
 
 ## Simplify conditional logic
 
+### Decompose conditional logic
+From 
+```Java
+if (!date.isBefore(subscriptionStartDate) && !date.isAfter(subscriptionEndDate)) {
+    // passed premissiong check, proceed 
+    validSubscriptionHandler.handle(...);
+    ...
+} else {
+    invalidSubscriptionHandler.handle(...);
+    ...
+}  
+```
+to
+```Java
+if (isValidSubscription(date)) {
+    // passed premissiong check, proceed 
+    validSubscriptionHandler.handle(...);
+    ...
+} else {
+    invalidSubscriptionHandler.handle(...);
+    ...
+}  
+```
+For conditional logic, breaking each branch condition into new functions has additional benefits: it highlights the conditional logic, clarifies what each branch does, and highlights the reason for each branch.
+
+
+### Consolidate Conditional Expression
+Sometimes we will find a string of conditional checks that check for different conditions but end up with the same behaviour.
+```Java
+if (employee.isJunior) return 0;
+if (employee.monthsEmployed < 12) return 0;
+if (employee.isPartTime) return 0;
+```
+Combine sequentially executed conditional expressions with logical or, and, not:
+```Java
+function isEligibleForPromotion() {
+    return ((employee.isJunior)
+            || (employee.monthsEmployed <> 12)
+            || (employee.isPartTime));
+}
+```
+
+### Replace Nested Conditional with Guard Clauses
+```Java
+function getPayAmount() {
+    int result;
+    if (isSenior)
+        result = seniorAmount();
+    else {
+        if (isRemote)
+            result = remoteAmount();
+        else {
+            if (isRetired)
+                result = retiredAmount();
+            else
+                result = normalPayAmount();
+        }
+    }
+    return result;
+}
+```
+
+```Java
+function getPayAmount() {
+    if (isSenior) return seniorAmount();
+    if (isRemote) return remoteAmount();
+    if (isRetired) return retiredAmount();
+    return normalPayAmount();
+}
+```
+
 ### Replace Conditional with Polymorphism
+```Java
+function getPayAmount() {
+    if (isSenior) return seniorAmount();
+    if (isRemote) return remoteAmount();
+    if (isRetired) return retiredAmount();
+    return normalPayAmount();
+}
+```
+
+```Java
+class Employee {
+  getSalary() {
+    return salary;
+  }
+}
+
+class SeniorEmployee extends Employee {
+  ...
+}
+
+class RemoteEmployee extends Employee {
+  ...
+}
+
+class RetiredEmployee extends Employee {
+  ...
+}
+
+function getPayAmount(Employee e) {
+  return e.getSalary();
+}
+```
+
 
 ## Reorganize data
