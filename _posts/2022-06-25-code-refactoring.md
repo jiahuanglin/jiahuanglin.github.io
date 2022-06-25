@@ -84,6 +84,7 @@ function isEligibleForPromotion() {
 ```
 
 ### Replace Nested Conditional with Guard Clauses
+From
 ```Java
 function getPayAmount() {
     int result;
@@ -102,7 +103,7 @@ function getPayAmount() {
     return result;
 }
 ```
-
+to
 ```Java
 function getPayAmount() {
     if (isSenior) return seniorAmount();
@@ -113,6 +114,7 @@ function getPayAmount() {
 ```
 
 ### Replace Conditional with Polymorphism
+From
 ```Java
 function getPayAmount() {
     if (isSenior) return seniorAmount();
@@ -121,7 +123,7 @@ function getPayAmount() {
     return normalPayAmount();
 }
 ```
-
+to
 ```Java
 class Employee {
   getSalary() {
