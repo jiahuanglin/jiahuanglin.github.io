@@ -1,5 +1,5 @@
 ---
-title: Database scalability
+title: Faster database queries
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
