@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2021-12-14 00:16:00 -0500
 categories: [Software]
-tags: [logging, server, Java]
+tags: [logging, framework, server, Java]
 ---
 
 Details of an Apache Log4j vulnerability were recently made public, which attackers could exploit to execute code remotely. The matter has caused an extremely heated discussion online and has led to countless programmers working overtime to change the code. Numerous software is implemented in java, each equipped with a logging system that depends on log4j. The silly-sounding question is, why do we need a logging module?

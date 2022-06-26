@@ -3,7 +3,7 @@ title: How to design a distributed cache system?
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2021-12-18 01:45:00 -0500
+date: 2022-05-26 01:45:00 -0500
 categories: [System]
 tags: [system design, cache system]
 ---

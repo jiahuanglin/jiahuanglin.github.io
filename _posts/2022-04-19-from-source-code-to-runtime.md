@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2022-04-19 22:14:00 -0500
 categories: [System]
-tags: [compiler]
+tags: [compiler, linker]
 ---
 
 What happens behind the scene when we compile the following code:

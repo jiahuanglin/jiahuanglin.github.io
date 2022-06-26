@@ -3,7 +3,7 @@ title: How does browser render a page
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
-date: 2022-06-17 10:23:00 -0500
+date: 2022-05-12 10:23:00 -0500
 categories: [System]
 tags: [browser, frontend]
 ---
