@@ -43,7 +43,7 @@ Code review also gives more people the opportunity to make useful suggestions; a
 
 ### Decompose conditional logic
 From 
-```Java
+```java
 if (!date.isBefore(subscriptionStartDate) && !date.isAfter(subscriptionEndDate)) {
     // passed premissiong check, proceed 
     validSubscriptionHandler.handle(...);
@@ -54,7 +54,7 @@ if (!date.isBefore(subscriptionStartDate) && !date.isAfter(subscriptionEndDate))
 }  
 ```
 to
-```Java
+```java
 if (isValidSubscription(date)) {
     // passed premissiong check, proceed 
     validSubscriptionHandler.handle(...);
@@ -85,7 +85,7 @@ function isEligibleForPromotion() {
 
 ### Replace Nested Conditional with Guard Clauses
 From
-```Java
+```java
 function getPayAmount() {
     int result;
     if (isSenior)
@@ -115,7 +115,7 @@ function getPayAmount() {
 
 ### Replace Conditional with Polymorphism
 From
-```Java
+```java
 function getPayAmount() {
     if (isSenior) return seniorAmount();
     if (isRemote) return remoteAmount();
@@ -124,7 +124,7 @@ function getPayAmount() {
 }
 ```
 to
-```Java
+```java
 class Employee {
   getSalary() {
     return salary;

@@ -12,7 +12,7 @@ tags: [framework, frontend]
 
 ### Class Component vs Functional Component
 The following is an example of writing a class component in React:
-```JavaScript
+```javascript
 class Welcome extends React.Component {
   render() {
     return <h1>Hello, {this.props.name}</h1>;
@@ -22,7 +22,7 @@ class Welcome extends React.Component {
 
 The React team hopes that components don't become complex containers but preferably just pipelines for data flow. The best way to write components should be functions, not classes, like the following:
 
-```JavaScript
+```javascript
 function Welcome(props) {
   return <h1>{props.name}</h1>;
 }
@@ -38,7 +38,7 @@ All hooks introduce external functionality to the function, so React makes it a 
 
 The following are some of the most common hooks that React provides by default.
 
-```JavaScript
+```javascript
 useState()
 useContext()
 useReducer()
@@ -50,7 +50,7 @@ useEffect()
 
 For example, we want the page title (document.title) to change when the component is loaded. Then, the action of changing the page title is a side effect of the component, and must be implemented with `useEffect()`.
 
-```JavaScript
+```javascript
 import React, { useEffect } from 'react';
 
 function Welcome(props) {
@@ -67,7 +67,7 @@ What `useEffect()` does is to specify a side effect function that is automatical
 
 Sometimes we don't want useEffect() to be executed every time it renders, so we can use its `2nd argument` to specify the dependencies of the side effect function using an array, and only if the dependencies change will it be re-rendered.
 
-```JavaScript
+```javascript
 function Welcome(props) {
   useEffect(() => {
     document.title = `Hello, ${props.name}`;
@@ -86,7 +86,7 @@ Hooks allows you to listen for a change in data. This change may trigger a refre
 2. A dependency is generally an array of constants, not a variable. 
 3. React uses shallow comparisons to compare whether dependencies have changed, so pay special attention to arrays or object types. If you are creating a new object each time, even if it is equivalent to the previous value, it will assume that the dependencies have changed. This area can easily lead to bugs when you first start using Hooks. For example, the following code: 
 
-```JavaScript
+```javascript
 function Sample() { 
     // Here a new array is created each time the component is executed 
     const todos = [text: 'Learn hooks.'}]; 
@@ -134,7 +134,7 @@ Store is the place where data is stored, you can think of it as a container. The
 
 Redux provides the createStore function, which is used to generate a Store.
 
-```JavaScript
+```javascript
 import { createStore } from 'redux';
 const store = createStore(fn);
 ```
@@ -146,7 +146,7 @@ The Store object contains all the data. If you want to get the data at a certain
 
 The State of the current moment can be obtained by store.getState().
 
-```JavaScript
+```javascript
 import { createStore } from 'redux';
 const store = createStore(fn);
 
@@ -160,7 +160,7 @@ Changes to the State will result in changes to the View. Action is a notificatio
 
 Action is an object. The type attribute is required and indicates the name of the Action. The other properties can be set freely, and the community has a specification to follow.
 
-```JavaScript
+```javascript
 const action = {
   type: 'ADD_TODO',
   payload: 'Learn Redux'
