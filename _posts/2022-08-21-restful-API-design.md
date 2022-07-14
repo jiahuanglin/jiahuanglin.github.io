@@ -1,5 +1,5 @@
 ---
-title: API design
+title: RESTful API design
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
@@ -51,7 +51,7 @@ The REST resource query interface usually need to implement paging, filtering, s
 - Sorting: Users often list the top 100 Members in a collection based on creation time or other factors. 
 - Search: When there are too many Members in a resource, users may search to find the required Member quickly, or to search if there is a certain type of resource with the name xxx, then you need to provide a search function. It is recommended to search by fuzzy match.
 
-## RPC API
+### Other than RESTful API
 RPC (Remote Procedure Call) is a computer communication protocol. The protocol allows a program on one computer to call a subroutine on another without the programmer having to program this interaction. RPC shields the underlying network communication details, allowing developers to focus less on the details of network programming and more on implementing the business logic itself, thus improving development efficiency. 
 
 The process of RPC invocation is as follows: 
