@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2022-01-03 02:04:00 -0500
-categories: [Language]
+categories: [Software]
 tags: [C++]
 ---
 
