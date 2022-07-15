@@ -1,0 +1,963 @@
+<!DOCTYPE html><html lang="en" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="generator" content="Jekyll v4.2.2" /><meta property="og:title" content="Implementing a simple RPC framework" /><meta name="author" content="Jacob Lin" /><meta property="og:locale" content="en" /><meta name="description" content="gRPC Example ```protobuf syntax = “proto3”;" /><meta property="og:description" content="gRPC Example ```protobuf syntax = “proto3”;" /><link rel="canonical" href="https://jiahuanglin.xyz/posts/implementing-a-simple-rpc-framework/" /><meta property="og:url" content="https://jiahuanglin.xyz/posts/implementing-a-simple-rpc-framework/" /><meta property="og:site_name" content="Jacob Lin" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2022-06-28T17:11:00-04:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Implementing a simple RPC framework" /><meta name="twitter:site" content="@afferentialism" /><meta name="twitter:creator" content="@Jacob Lin" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Lin"},"dateModified":"2022-06-28T17:11:00-04:00","datePublished":"2022-06-28T17:11:00-04:00","description":"gRPC Example ```protobuf syntax = “proto3”;","headline":"Implementing a simple RPC framework","mainEntityOfPage":{"@type":"WebPage","@id":"https://jiahuanglin.xyz/posts/implementing-a-simple-rpc-framework/"},"url":"https://jiahuanglin.xyz/posts/implementing-a-simple-rpc-framework/"}</script><title>Implementing a simple RPC framework | Jacob Lin</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Jacob Lin"><meta name="application-name" content="Jacob Lin"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get MODE_ATTR() { return "data-mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_ATTR); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc" data-topbar-visible="true"><div id="sidebar" class="d-flex flex-column align-items-end"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" class="mx-auto"> <img src="/assets/img/avatar.jpg" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Jacob Lin</a></div><div class="site-subtitle font-italic">Software Engineer</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/jiahuanglin" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/afferentialism" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['jiahuanglin27','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper"><div id="topbar" class="container d-flex align-items-center justify-content-between h-100 pl-3 pr-3 pl-md-4 pr-md-4"> <span id="breadcrumb"> <span> <a href="/"> Home </a> </span> <span>Implementing a simple RPC framework</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..."> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper" class="d-flex justify-content-center"><div id="main" class="container pl-xl-4 pr-xl-4"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-9 pr-xl-4"><div class="post pl-1 pr-1 pl-md-2 pr-md-2"><h1 data-toc-skip>Implementing a simple RPC framework</h1><div class="post-meta text-muted"> <span> Posted <em class="" data-ts="1656450660" data-df="ll" data-toggle="tooltip" data-placement="bottom"> Jun 28, 2022 </em> </span><div class="d-flex justify-content-between"> <span> By <em> Jiahuang(Jacob) Lin </em> </span><div> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="1771 words"> <em>9 min</em> read</span></div></div></div><div class="post-content"><h3 id="grpc-example"><span class="mr-2">gRPC Example</span><a href="#grpc-example" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-protobuf highlighter-rouge"><div class="code-header"> <span data-label-text="Protobuf"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="na">syntax</span> <span class="o">=</span> <span class="s">"proto3"</span><span class="p">;</span>
+
+<span class="k">option</span> <span class="na">java_multiple_files</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="k">option</span> <span class="na">java_package</span> <span class="o">=</span> <span class="s">"io.grpc.hello"</span><span class="p">;</span>
+<span class="k">option</span> <span class="na">java_outer_classname</span> <span class="o">=</span> <span class="s">"HelloProto"</span><span class="p">;</span>
+<span class="k">option</span> <span class="na">objc_class_prefix</span> <span class="o">=</span> <span class="s">"HLW"</span><span class="p">;</span>
+
+<span class="kn">package</span> <span class="nn">hello</span><span class="p">;</span>
+
+<span class="kd">service</span> <span class="n">HelloService</span><span class="p">{</span>
+  <span class="k">rpc</span> <span class="n">Say</span><span class="p">(</span><span class="n">HelloRequest</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">HelloReply</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">HelloRequest</span> <span class="p">{</span>
+  <span class="kt">string</span> <span class="na">name</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">HelloReply</span> <span class="p">{</span>
+  <span class="kt">string</span> <span class="kd">message</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>Client.java</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+</pre><td class="rouge-code"><pre><span class="kn">package</span> <span class="nn">io.grpc.hello</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.grpc.ManagedChannel</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.grpc.ManagedChannelBuilder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.grpc.StatusRuntimeException</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.concurrent.TimeUnit</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldClient</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">ManagedChannel</span> <span class="n">channel</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">HelloServiceGrpc</span><span class="o">.</span><span class="na">HelloServiceBlockingStub</span> <span class="n">blockingStub</span><span class="o">;</span>
+
+    <span class="cm">/**
+    * construct network channel 
+    **/</span>
+    <span class="kd">public</span> <span class="nf">HelloWorldClient</span><span class="o">(</span><span class="nc">String</span> <span class="n">host</span><span class="o">,</span> <span class="kt">int</span> <span class="n">port</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="nc">ManagedChannelBuilder</span><span class="o">.</span><span class="na">forAddress</span><span class="o">(</span><span class="n">host</span><span class="o">,</span> <span class="n">port</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">usePlaintext</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+    * build stub for sending request
+    **/</span>
+    <span class="nc">HelloWorldClient</span><span class="o">(</span><span class="nc">ManagedChannel</span> <span class="n">channel</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">channel</span> <span class="o">=</span> <span class="n">channel</span><span class="o">;</span>
+        <span class="n">blockingStub</span> <span class="o">=</span> <span class="nc">HelloServiceGrpc</span><span class="o">.</span><span class="na">newBlockingStub</span><span class="o">(</span><span class="n">channel</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="cm">/**
+    * resource destruction
+    **/</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shutdown</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">InterruptedException</span> <span class="o">{</span>
+        <span class="n">channel</span><span class="o">.</span><span class="na">shutdown</span><span class="o">().</span><span class="na">awaitTermination</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="nc">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+    <span class="o">}</span>
+
+ 
+    <span class="cm">/**
+    * send rpc request
+    **/</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">say</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">HelloRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="nc">HelloRequest</span><span class="o">.</span><span class="na">newBuilder</span><span class="o">().</span><span class="na">setName</span><span class="o">(</span><span class="n">name</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+        <span class="nc">HelloReply</span> <span class="n">response</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">blockingStub</span><span class="o">.</span><span class="na">say</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">StatusRuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">response</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+            <span class="nc">HelloWorldClient</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HelloWorldClient</span><span class="o">(</span><span class="s">"127.0.0.1"</span><span class="o">,</span> <span class="mi">50051</span><span class="o">);</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">client</span><span class="o">.</span><span class="na">say</span><span class="o">(</span><span class="s">"world"</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                <span class="n">client</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+            <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><p>Server.java</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+</pre><td class="rouge-code"><pre><span class="kn">package</span> <span class="nn">io.grpc.hello</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.grpc.Server</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.grpc.ServerBuilder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.grpc.stub.StreamObserver</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServer</span> <span class="o">{</span>
+
+  <span class="kd">static</span> <span class="kd">class</span> <span class="nc">HelloServiceImpl</span> <span class="kd">extends</span> <span class="nc">HelloServiceGrpc</span><span class="o">.</span><span class="na">HelloServiceImplBase</span> <span class="o">{</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">say</span><span class="o">(</span><span class="nc">HelloRequest</span> <span class="n">req</span><span class="o">,</span> <span class="nc">StreamObserver</span><span class="o">&lt;</span><span class="nc">HelloReply</span><span class="o">&gt;</span> <span class="n">responseObserver</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">HelloReply</span> <span class="n">reply</span> <span class="o">=</span> <span class="nc">HelloReply</span><span class="o">.</span><span class="na">newBuilder</span><span class="o">().</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"Hello "</span> <span class="o">+</span> <span class="n">req</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">build</span><span class="o">();</span>
+    <span class="n">responseObserver</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">reply</span><span class="o">);</span>
+    <span class="n">responseObserver</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+  <span class="kd">private</span> <span class="nc">Server</span> <span class="n">server</span><span class="o">;</span>
+
+  <span class="cm">/**
+  * expose service
+  **/</span>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">50051</span><span class="o">;</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="nc">ServerBuilder</span><span class="o">.</span><span class="na">forPort</span><span class="o">(</span><span class="n">port</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">addService</span><span class="o">(</span><span class="k">new</span> <span class="nc">HelloServiceImpl</span><span class="o">())</span>
+        <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">start</span><span class="o">();</span>
+
+    <span class="nc">Runtime</span><span class="o">.</span><span class="na">getRuntime</span><span class="o">().</span><span class="na">addShutdownHook</span><span class="o">(</span><span class="k">new</span> <span class="nc">Thread</span><span class="o">()</span> <span class="o">{</span>
+      <span class="nd">@Override</span>
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">HelloWorldServer</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">});</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**
+  * resource destruction
+  **/</span>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">server</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">server</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**
+  * resource destruction
+  **/</span>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">blockUntilShutdown</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">InterruptedException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">server</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">server</span><span class="o">.</span><span class="na">awaitTermination</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span> <span class="nc">InterruptedException</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="nc">HelloWorldServer</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HelloWorldServer</span><span class="o">();</span>
+    <span class="n">server</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+    <span class="n">server</span><span class="o">.</span><span class="na">blockUntilShutdown</span><span class="o">();</span>
+  <span class="o">}</span>
+  
+<span class="o">}</span>
+</pre></table></code></div></div><h3 id="dynamic-proxy"><span class="mr-2">Dynamic proxy</span><a href="#dynamic-proxy" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>RPC will automatically generate a proxy class for the interface.</p><p>When we inject the interface into the project, the actual binding process is the proxy class generated by the interface. This way, when the interface method is called, it is intercepted by the generated proxy class so that we can add remote call logic to the generated proxy class. By this technique, we can help users to shield the details of the remote call, and achieve the experience of calling the remote as if it were a local call.</p><p>Let’s take a look at the following example:</p><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Hello</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="nf">say</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RealHello</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">invoke</span><span class="o">(){</span>
+        <span class="k">return</span> <span class="s">"I'm proxy"</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">// Autogenerated MyProxy class hides the details of remote call into RealHello</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyProxy</span> <span class="kd">implements</span> <span class="nc">InvocationHandler</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">Object</span> <span class="n">target</span><span class="o">;</span>
+
+    <span class="nc">MyProxy</span><span class="o">(</span><span class="nc">Object</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="nc">Object</span> <span class="n">proxy</span><span class="o">,</span> <span class="nc">Method</span> <span class="n">method</span><span class="o">,</span> <span class="nc">Object</span><span class="o">[]</span> <span class="n">paramValues</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">((</span><span class="nc">RealHello</span><span class="o">)</span><span class="n">target</span><span class="o">).</span><span class="na">invoke</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestProxy</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">){</span>
+        <span class="nc">MyProxy</span> <span class="n">proxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">MyProxy</span><span class="o">(</span><span class="k">new</span> <span class="nc">RealHello</span><span class="o">());</span>
+        <span class="nc">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="nc">ClassLoaderUtils</span><span class="o">.</span><span class="na">getCurrentClassLoader</span><span class="o">();</span>
+
+        <span class="c1">// this line binds the Hello interface to the MyProxy</span>
+        <span class="nc">Hello</span> <span class="n">test</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Hello</span><span class="o">)</span> <span class="nc">Proxy</span><span class="o">.</span><span class="na">newProxyInstance</span><span class="o">(</span><span class="n">classLoader</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Class</span><span class="o">[]{</span><span class="nc">Hello</span><span class="o">.</span><span class="na">class</span><span class="o">},</span> <span class="n">proxy</span><span class="o">);</span>
+
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">test</span><span class="o">.</span><span class="na">say</span><span class="o">());</span>  <span class="c1">// this prints "I'm proxy"</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h2 id="implementing-a-framework"><span class="mr-2">Implementing a framework</span><a href="#implementing-a-framework" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RpcRequest</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">requestId</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">className</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">methodName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">parameterTypes</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Object</span><span class="o">[]</span> <span class="n">parameters</span><span class="o">;</span>
+
+    <span class="c1">// getter/setter...</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RpcResponse</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">requestId</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Throwable</span> <span class="n">error</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Object</span> <span class="n">result</span><span class="o">;</span>
+
+    <span class="c1">// getter/setter...</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h4 id="serializaion-use-hessian"><span class="mr-2">Serializaion (use Hessian)</span><a href="#serializaion-use-hessian" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre><td class="rouge-code"><pre><span class="kn">import</span> <span class="nn">com.caucho.hessian.io.HessianInput</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.caucho.hessian.io.HessianOutput</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.ByteArrayInputStream</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.ByteArrayOutputStream</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Serializer</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">serialize</span><span class="o">(</span><span class="no">T</span> <span class="n">input</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="nc">ByteArrayOutputStream</span> <span class="n">byteArrayOutputStream</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ByteArrayOutputStream</span><span class="o">();</span>
+        <span class="nc">HessianOutput</span> <span class="n">hessianOutput</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HessianOutput</span><span class="o">(</span><span class="n">byteArrayOutputStream</span><span class="o">);</span>
+        <span class="n">hessianOutput</span><span class="o">.</span><span class="na">writeObject</span><span class="o">(</span><span class="n">input</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">byteArrayOutputStream</span><span class="o">.</span><span class="na">toByteArray</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="no">T</span> <span class="nf">deserialize</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">input</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="nc">ByteArrayInputStream</span> <span class="n">byteArrayInputStream</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ByteArrayInputStream</span><span class="o">(</span><span class="n">input</span><span class="o">);</span>
+        <span class="nc">HessianInput</span> <span class="n">hessianInput</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HessianInput</span><span class="o">(</span><span class="n">byteArrayInputStream</span><span class="o">);</span>
+        <span class="k">return</span> <span class="o">(</span><span class="no">T</span><span class="o">)</span> <span class="n">hessianInput</span><span class="o">.</span><span class="na">readObject</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h4 id="service-discovery"><span class="mr-2">Service discovery</span><a href="#service-discovery" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>
+</pre></table></code></div></div><h4 id="request-handle"><span class="mr-2">Request handle</span><a href="#request-handle" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RequestHandler</span> <span class="kd">extends</span> <span class="nc">SimpleChannelInboundHandler</span><span class="o">&lt;</span><span class="nc">RpcRequest</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOGGER</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">RpcHandler</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="kd">private</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">serviceMap</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">RequestHandler</span><span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">serviceMap</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">serviceMap</span> <span class="o">=</span> <span class="n">serviceMap</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">channelRead0</span><span class="o">(</span><span class="kd">final</span> <span class="nc">ChannelHandlerContext</span> <span class="n">ctx</span><span class="o">,</span> <span class="nc">RpcRequest</span> <span class="n">request</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="nc">RpcResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RpcResponse</span><span class="o">();</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setRequestId</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getRequestId</span><span class="o">());</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Object</span> <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">setResult</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">setError</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="na">writeAndFlush</span><span class="o">(</span><span class="n">response</span><span class="o">).</span><span class="na">addListener</span><span class="o">(</span><span class="nc">ChannelFutureListener</span><span class="o">.</span><span class="na">CLOSE</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nc">RpcResponse</span> <span class="nf">handle</span><span class="o">(</span><span class="nc">RpcRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">RpcResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RpcResponse</span><span class="o">();</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span>
+        <span class="nc">Object</span> <span class="n">instance</span> <span class="o">=</span> <span class="n">serviceMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getInterfaceName</span><span class="o">());</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">types</span> <span class="o">=</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getArguments</span><span class="o">())</span>
+                                      <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">Argument:</span><span class="o">:</span><span class="n">getType</span><span class="o">)</span>
+                                      <span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="nc">Class</span><span class="o">&lt;?&gt;[]::</span><span class="k">new</span><span class="o">);</span>
+            <span class="nc">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="na">getClass</span><span class="o">()</span>
+                                    <span class="o">.</span><span class="na">getMethod</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getMethodName</span><span class="o">(),</span> <span class="n">types</span><span class="o">);</span>
+            <span class="nc">Object</span><span class="o">[]</span> <span class="n">args</span> <span class="o">=</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getArguments</span><span class="o">())</span>
+                                    <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">Argument:</span><span class="o">:</span><span class="n">getValue</span><span class="o">)</span>
+                                    <span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="nc">Object</span><span class="o">[]::</span><span class="k">new</span><span class="o">);</span>
+            <span class="nc">Object</span> <span class="n">result</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">instance</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">setResponse</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NoSuchMethodException</span> <span class="o">|</span> <span class="nc">IllegalAccessException</span> <span class="o">|</span> <span class="nc">InvocationTargetException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">userEventTriggered</span><span class="o">(</span><span class="nc">ChannelHandlerContext</span> <span class="n">ctx</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">event</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">event</span> <span class="k">instanceof</span> <span class="nc">IdleStateEvent</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">IdleStateEvent</span> <span class="n">e</span> <span class="o">=</span> <span class="o">(</span><span class="nc">IdleStateEvent</span><span class="o">)</span> <span class="n">event</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">state</span><span class="o">()</span> <span class="o">==</span> <span class="nc">IdleState</span><span class="o">.</span><span class="na">READER_IDLE</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="na">channel</span><span class="o">().</span><span class="na">close</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="kd">super</span><span class="o">.</span><span class="na">userEventTriggered</span><span class="o">(</span><span class="n">ctx</span><span class="o">,</span> <span class="n">event</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">exceptionCaught</span><span class="o">(</span><span class="nc">ChannelHandlerContext</span> <span class="n">ctx</span><span class="o">,</span> <span class="nc">Throwable</span> <span class="n">cause</span><span class="o">)</span> <span class="o">{</span>
+        <span class="no">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"server caught exception"</span><span class="o">,</span> <span class="n">cause</span><span class="o">);</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h4 id="rpc-service"><span class="mr-2">RPC service</span><a href="#rpc-service" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RpcServer</span> <span class="kd">implements</span> <span class="nc">ApplicationContextAware</span><span class="o">,</span> <span class="nc">InitializingBean</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOGGER</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">RpcServer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">serverAddress</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">ServiceRegistry</span> <span class="n">serviceRegistry</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">handlerMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">public</span> <span class="nf">RpcServer</span><span class="o">(</span><span class="nc">String</span> <span class="n">serverAddress</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">serverAddress</span> <span class="o">=</span> <span class="n">serverAddress</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">RpcServer</span><span class="o">(</span><span class="nc">String</span> <span class="n">serverAddress</span><span class="o">,</span> <span class="nc">ServiceRegistry</span> <span class="n">serviceRegistry</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">serverAddress</span> <span class="o">=</span> <span class="n">serverAddress</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">serviceRegistry</span> <span class="o">=</span> <span class="n">serviceRegistry</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setApplicationContext</span><span class="o">(</span><span class="nc">ApplicationContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">BeansException</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nc">MapUtils</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">serviceBeanMap</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="nc">Object</span> <span class="n">serviceBean</span> <span class="o">:</span> <span class="n">serviceBeanMap</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+                <span class="nc">String</span> <span class="n">interfaceName</span> <span class="o">=</span> <span class="n">serviceBean</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getAnnotation</span><span class="o">(</span><span class="nc">RpcService</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">value</span><span class="o">().</span><span class="na">getName</span><span class="o">();</span>
+                <span class="n">handlerMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">interfaceName</span><span class="o">,</span> <span class="n">serviceBean</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterPropertiesSet</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="nc">EventLoopGroup</span> <span class="n">bossGroup</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">NioEventLoopGroup</span><span class="o">();</span>
+        <span class="nc">EventLoopGroup</span> <span class="n">workerGroup</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">NioEventLoopGroup</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">ServerBootstrap</span> <span class="n">bootstrap</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ServerBootstrap</span><span class="o">();</span>
+            <span class="n">bootstrap</span><span class="o">.</span><span class="na">group</span><span class="o">(</span><span class="n">bossGroup</span><span class="o">,</span> <span class="n">workerGroup</span><span class="o">).</span><span class="na">channel</span><span class="o">(</span><span class="nc">NioServerSocketChannel</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">childHandler</span><span class="o">(</span><span class="k">new</span> <span class="nc">ChannelInitializer</span><span class="o">&lt;</span><span class="nc">SocketChannel</span><span class="o">&gt;()</span> <span class="o">{</span>
+                    <span class="nd">@Override</span>
+                    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">initChannel</span><span class="o">(</span><span class="nc">SocketChannel</span> <span class="n">channel</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+                        <span class="n">channel</span><span class="o">.</span><span class="na">pipeline</span><span class="o">()</span>
+                            <span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="k">new</span> <span class="nc">RpcDecoder</span><span class="o">(</span><span class="nc">RpcRequest</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+                            <span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="k">new</span> <span class="nc">RpcEncoder</span><span class="o">(</span><span class="nc">RpcResponse</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+                            <span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="k">new</span> <span class="nc">RequestHandler</span><span class="o">(</span><span class="n">handlerMap</span><span class="o">));</span>
+                    <span class="o">}</span>
+                <span class="o">})</span>
+                <span class="o">.</span><span class="na">option</span><span class="o">(</span><span class="nc">ChannelOption</span><span class="o">.</span><span class="na">SO_BACKLOG</span><span class="o">,</span> <span class="mi">128</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">childOption</span><span class="o">(</span><span class="nc">ChannelOption</span><span class="o">.</span><span class="na">SO_KEEPALIVE</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+
+            <span class="nc">String</span><span class="o">[]</span> <span class="n">array</span> <span class="o">=</span> <span class="n">serverAddress</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">":"</span><span class="o">);</span>
+            <span class="nc">String</span> <span class="n">host</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+            <span class="kt">int</span> <span class="n">port</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="mi">1</span><span class="o">]);</span>
+
+            <span class="nc">ChannelFuture</span> <span class="n">future</span> <span class="o">=</span> <span class="n">bootstrap</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">host</span><span class="o">,</span> <span class="n">port</span><span class="o">).</span><span class="na">sync</span><span class="o">();</span>
+            <span class="no">LOGGER</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"server started on port {}"</span><span class="o">,</span> <span class="n">port</span><span class="o">);</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">serviceRegistry</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">serviceRegistry</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">serverAddress</span><span class="o">);</span>
+            <span class="o">}</span>
+
+            <span class="n">future</span><span class="o">.</span><span class="na">channel</span><span class="o">().</span><span class="na">closeFuture</span><span class="o">().</span><span class="na">sync</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">workerGroup</span><span class="o">.</span><span class="na">shutdownGracefully</span><span class="o">();</span>
+            <span class="n">bossGroup</span><span class="o">.</span><span class="na">shutdownGracefully</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h4 id="load-balancing"><span class="mr-2">Load balancing</span><a href="#load-balancing" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RoundRobinLoadBalancer</span> <span class="kd">implements</span> <span class="nc">LoadBalancer</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">AtomicInteger</span> <span class="n">current</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AtomicInteger</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">RpcProtocol</span> <span class="nf">route</span><span class="o">(</span><span class="nc">String</span> <span class="n">serviceKey</span><span class="o">,</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Connection</span><span class="o">,</span> <span class="nc">RpcClient</span><span class="o">&gt;</span> <span class="n">connectedServerNodes</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Connection</span><span class="o">&gt;&gt;</span> <span class="n">serviceMap</span> <span class="o">=</span> <span class="n">getServiceMap</span><span class="o">(</span><span class="n">connectedServerNodes</span><span class="o">);</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Connection</span><span class="o">&gt;</span> <span class="n">addressList</span> <span class="o">=</span> <span class="n">serviceMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">serviceKey</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">addressList</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">addressList</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">addressList</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">getAndAdd</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="o">+</span> <span class="n">size</span><span class="o">)</span> <span class="o">%</span> <span class="n">size</span><span class="o">;</span>
+            <span class="k">return</span> <span class="n">addressList</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="o">(</span><span class="s">"Can not find connection for service: "</span> <span class="o">+</span> <span class="n">serviceKey</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h4 id="dynamic-proxy-1"><span class="mr-2">Dynamic proxy</span><a href="#dynamic-proxy-1" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RpcProxy</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">serverAddress</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">ServiceDiscovery</span> <span class="n">serviceDiscovery</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">RpcProxy</span><span class="o">(</span><span class="nc">String</span> <span class="n">serverAddress</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">serverAddress</span> <span class="o">=</span> <span class="n">serverAddress</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">RpcProxy</span><span class="o">(</span><span class="nc">ServiceDiscovery</span> <span class="n">serviceDiscovery</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">serviceDiscovery</span> <span class="o">=</span> <span class="n">serviceDiscovery</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="no">T</span> <span class="nf">create</span><span class="o">(</span><span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">interfaceClass</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="no">T</span><span class="o">)</span> <span class="nc">Proxy</span><span class="o">.</span><span class="na">newProxyInstance</span><span class="o">(</span>
+            <span class="n">interfaceClass</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">(),</span>
+            <span class="k">new</span> <span class="nc">Class</span><span class="o">&lt;?&gt;[]{</span><span class="n">interfaceClass</span><span class="o">},</span>
+            <span class="k">new</span> <span class="nf">InvocationHandler</span><span class="o">()</span> <span class="o">{</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="nc">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="nc">Object</span> <span class="n">proxy</span><span class="o">,</span> <span class="nc">Method</span> <span class="n">method</span><span class="o">,</span> <span class="nc">Object</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Throwable</span> <span class="o">{</span>
+                    <span class="nc">RpcRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RpcRequest</span><span class="o">();</span>
+                    <span class="n">request</span><span class="o">.</span><span class="na">setRequestId</span><span class="o">(</span><span class="no">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
+                    <span class="n">request</span><span class="o">.</span><span class="na">setClassName</span><span class="o">(</span><span class="n">method</span><span class="o">.</span><span class="na">getDeclaringClass</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+                    <span class="n">request</span><span class="o">.</span><span class="na">setMethodName</span><span class="o">(</span><span class="n">method</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+                    <span class="n">request</span><span class="o">.</span><span class="na">setParameterTypes</span><span class="o">(</span><span class="n">method</span><span class="o">.</span><span class="na">getParameterTypes</span><span class="o">());</span>
+                    <span class="n">request</span><span class="o">.</span><span class="na">setParameters</span><span class="o">(</span><span class="n">args</span><span class="o">);</span>
+
+                    <span class="k">if</span> <span class="o">(</span><span class="n">serviceDiscovery</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="n">serverAddress</span> <span class="o">=</span> <span class="n">serviceDiscovery</span><span class="o">.</span><span class="na">discover</span><span class="o">();</span>
+                    <span class="o">}</span>
+
+                    <span class="nc">String</span><span class="o">[]</span> <span class="n">array</span> <span class="o">=</span> <span class="n">serverAddress</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">":"</span><span class="o">);</span>
+                    <span class="nc">String</span> <span class="n">host</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+                    <span class="kt">int</span> <span class="n">port</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="mi">1</span><span class="o">]);</span>
+
+                    <span class="nc">RpcClient</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RpcClient</span><span class="o">(</span><span class="n">host</span><span class="o">,</span> <span class="n">port</span><span class="o">);</span>
+                    <span class="nc">RpcResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+                    <span class="k">if</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">isError</span><span class="o">())</span> <span class="o">{</span>
+                        <span class="k">throw</span> <span class="n">response</span><span class="o">.</span><span class="na">getError</span><span class="o">();</span>
+                    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="na">getResult</span><span class="o">();</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div><h4 id="client"><span class="mr-2">Client</span><a href="#client" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><div class="language-java highlighter-rouge"><div class="code-header"> <span data-label-text="Java"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+</pre><td class="rouge-code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RpcClient</span> <span class="kd">extends</span> <span class="nc">SimpleChannelInboundHandler</span><span class="o">&lt;</span><span class="nc">RpcResponse</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOGGER</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">RpcClient</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">host</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">port</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">RpcResponse</span> <span class="n">response</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Object</span> <span class="n">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Object</span><span class="o">();</span>
+
+    <span class="kd">public</span> <span class="nf">RpcClient</span><span class="o">(</span><span class="nc">String</span> <span class="n">host</span><span class="o">,</span> <span class="kt">int</span> <span class="n">port</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">host</span> <span class="o">=</span> <span class="n">host</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">port</span> <span class="o">=</span> <span class="n">port</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">channelRead0</span><span class="o">(</span><span class="nc">ChannelHandlerContext</span> <span class="n">ctx</span><span class="o">,</span> <span class="nc">RpcResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">;</span>
+
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">obj</span><span class="o">.</span><span class="na">notifyAll</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">exceptionCaught</span><span class="o">(</span><span class="nc">ChannelHandlerContext</span> <span class="n">ctx</span><span class="o">,</span> <span class="nc">Throwable</span> <span class="n">cause</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="no">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"client caught exception"</span><span class="o">,</span> <span class="n">cause</span><span class="o">);</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">RpcResponse</span> <span class="nf">send</span><span class="o">(</span><span class="nc">RpcRequest</span> <span class="n">request</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="nc">EventLoopGroup</span> <span class="n">group</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">NioEventLoopGroup</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Bootstrap</span> <span class="n">bootstrap</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Bootstrap</span><span class="o">();</span>
+            <span class="n">bootstrap</span><span class="o">.</span><span class="na">group</span><span class="o">(</span><span class="n">group</span><span class="o">).</span><span class="na">channel</span><span class="o">(</span><span class="nc">NioSocketChannel</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">handler</span><span class="o">(</span><span class="k">new</span> <span class="nc">ChannelInitializer</span><span class="o">&lt;</span><span class="nc">SocketChannel</span><span class="o">&gt;()</span> <span class="o">{</span>
+                    <span class="nd">@Override</span>
+                    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">initChannel</span><span class="o">(</span><span class="nc">SocketChannel</span> <span class="n">channel</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+                        <span class="n">channel</span><span class="o">.</span><span class="na">pipeline</span><span class="o">()</span>
+                            <span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="k">new</span> <span class="nc">RpcEncoder</span><span class="o">(</span><span class="nc">RpcRequest</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+                            <span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="k">new</span> <span class="nc">RpcDecoder</span><span class="o">(</span><span class="nc">RpcResponse</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+                            <span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="nc">RpcClient</span><span class="o">.</span><span class="na">this</span><span class="o">);</span>
+                    <span class="o">}</span>
+                <span class="o">})</span>
+                <span class="o">.</span><span class="na">option</span><span class="o">(</span><span class="nc">ChannelOption</span><span class="o">.</span><span class="na">SO_KEEPALIVE</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+
+            <span class="nc">ChannelFuture</span> <span class="n">future</span> <span class="o">=</span> <span class="n">bootstrap</span><span class="o">.</span><span class="na">connect</span><span class="o">(</span><span class="n">host</span><span class="o">,</span> <span class="n">port</span><span class="o">).</span><span class="na">sync</span><span class="o">();</span>
+            <span class="n">future</span><span class="o">.</span><span class="na">channel</span><span class="o">().</span><span class="na">writeAndFlush</span><span class="o">(</span><span class="n">request</span><span class="o">).</span><span class="na">sync</span><span class="o">();</span>
+
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">obj</span><span class="o">.</span><span class="na">wait</span><span class="o">();</span>
+            <span class="o">}</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">response</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">future</span><span class="o">.</span><span class="na">channel</span><span class="o">().</span><span class="na">closeFuture</span><span class="o">().</span><span class="na">sync</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">group</span><span class="o">.</span><span class="na">shutdownGracefully</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></table></code></div></div></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/software/'>Software</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/rpc/" class="post-tag no-text-decoration" >RPC</a> <a href="/tags/framework/" class="post-tag no-text-decoration" >framework</a> <a href="/tags/server/" class="post-tag no-text-decoration" >server</a> <a href="/tags/serialization/" class="post-tag no-text-decoration" >serialization</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=Implementing+a+simple+RPC+framework+-+Jacob+Lin&url=https%3A%2F%2Fjiahuanglin.xyz%2Fposts%2Fimplementing-a-simple-rpc-framework%2F" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=Implementing+a+simple+RPC+framework+-+Jacob+Lin&u=https%3A%2F%2Fjiahuanglin.xyz%2Fposts%2Fimplementing-a-simple-rpc-framework%2F" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://t.me/share/url?url=https%3A%2F%2Fjiahuanglin.xyz%2Fposts%2Fimplementing-a-simple-rpc-framework%2F&text=Implementing+a+simple+RPC+framework+-+Jacob+Lin" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="Copy link" data-title-succeed="Link copied successfully!"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">Recently Updated</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/learning-java-annotations/">Learning Java annotations</a><li><a href="/posts/my-notes-of-reading-effective-c++/">My notes of reading effective C++</a><li><a href="/posts/how-to-shorten-the-url/">How to shorten the url</a><li><a href="/posts/floating-point-number-and-fixed-point-number/">Floating point numbers and fixed point numbers</a><li><a href="/posts/scanline-algorithm/">Scanline algorithm</a></ul></div><div id="access-tags"><div class="panel-heading">Trending Tags</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/java/">Java</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/design-pattern/">design pattern</a> <a class="post-tag" href="/tags/go/">Go</a> <a class="post-tag" href="/tags/server/">server</a> <a class="post-tag" href="/tags/compiler/">compiler</a> <a class="post-tag" href="/tags/framework/">framework</a> <a class="post-tag" href="/tags/database/">database</a> <a class="post-tag" href="/tags/frontend/">frontend</a> <a class="post-tag" href="/tags/graphics/">graphics</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">Contents</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 pl-3 pr-3 pr-xl-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>Further Reading</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/simple-implementation-of-a-logging-framework/"><div class="card-body"> <em class="small" data-ts="1639458960" data-df="ll" > Dec 14, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Simple implementation of a logging framework</h3><div class="text-muted small"><p> Details of an Apache Log4j vulnerability were recently made public, which attackers could exploit to execute code remotely. The matter has caused an extremely heated discussion online and has led t...</p></div></div></a></div><div class="card"> <a href="/posts/select-poll-and-epoll/"><div class="card-body"> <em class="small" data-ts="1647530580" data-df="ll" > Mar 17, 2022 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Select, poll and epoll</h3><div class="text-muted small"><p> What is I/O multiplexing Consider a program that reads from stdin and sends the read in content to a socket channel and vice versa (reads from socket channel and writes to stdout). We could use the...</p></div></div></a></div><div class="card"> <a href="/posts/configuring-the-runtime-parameters-for-server-program/"><div class="card-body"> <em class="small" data-ts="1638582900" data-df="ll" > Dec 3, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Configuring the runtime parameters for server program</h3><div class="text-muted small"><p> Although we can pass argv through the main function, it is still tedious when dealing with server applications with lots of parameters that need to be specified flexibly. As a result, server progra...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/faster-database-queries/" class="btn btn-outline-primary" prompt="Older"><p>Faster database queries</p></a> <a href="/posts/react-redux-and-hooks/" class="btn btn-outline-primary" prompt="Newer"><p>React, redux and hooks</p></a></div></div></div><footer class="row pl-3 pr-3"><div class="col-12 d-flex justify-content-between align-items-center text-muted pl-0 pr-0"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/jiahuanglin">Jiahuang(Jacob) Lin</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">Trending Tags</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/java/">Java</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/design-pattern/">design pattern</a> <a class="post-tag" href="/tags/go/">Go</a> <a class="post-tag" href="/tags/server/">server</a> <a class="post-tag" href="/tags/compiler/">compiler</a> <a class="post-tag" href="/tags/framework/">framework</a> <a class="post-tag" href="/tags/database/">database</a> <a class="post-tag" href="/tags/frontend/">frontend</a> <a class="post-tag" href="/tags/graphics/">graphics</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a><div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="false"><div class="toast-header"> <button type="button" class="ml-2 ml-auto close" data-dismiss="toast" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></div><div class="toast-body text-center pt-0"><p class="pl-2 pr-2 mb-3">A new version of content is available.</p><button type="button" class="btn btn-primary" aria-label="Update"> Update </button></div></div><script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No results found.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/lozad/dist/lozad.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1/dayjs.min.js,npm/dayjs@1/locale/en.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.bundle.min.js"></script> <script defer src="/app.js"></script>
