@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2022-04-05 17:12:00 -0500
-categories: [Data Structure]
+categories: [Algorithm & Data Structure]
 tags: [number format]
 ---
 

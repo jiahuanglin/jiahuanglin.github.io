@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2022-03-01 20:23:00 -0500
-categories: [Algorithm, Data Structure]
+categories: [Algorithm & Data Structure]
 tags: [hashmap]
 ---
 

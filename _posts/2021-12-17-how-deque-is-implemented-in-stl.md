@@ -4,7 +4,7 @@ author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
 date: 2021-12-17 17:41:00 -0500
-categories: [Data Structure]
+categories: [Algorithm & Data Structure]
 tags: [C++, STL]
 ---
 
