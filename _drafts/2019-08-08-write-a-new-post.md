@@ -8,7 +8,7 @@ mermaid: true
 render_with_liquid: false
 ---
 
-This post will guide you how to write a post on _Chirpy_ theme. Even if you have previous experience with Jekyll, this article is worth reading, because many features require specific variables to be set.
+This tutorial will guide you how to write a post in the _Chirpy_ template, and it's worth reading even if you've used Jekyll before, as many features require specific variables to be set.
 
 ## Naming and Path
 
@@ -49,7 +49,7 @@ tags: [bee]
 
 The author information of the post usually does not need to be filled in the _Front Matter_ , they will be obtained from variables `social.name` and the first entry of `social.links` of the configuration file by default. But you can also override it as follows:
 
-Add author information in `_data/authors.yml` (If your website doesn't have this file, don't hesitate to create one.)
+Adding author information in `_data/authors.yml` (If your website doesn't have this file, don't hesitate to create one).
 
 ```yaml
 <author_id>:
@@ -59,15 +59,21 @@ Add author information in `_data/authors.yml` (If your website doesn't have this
 ```
 {: file="_data/authors.yml" }
 
-And then set up the custom author in the post's YAML block:
+
+And then use `author` to specify a single entry or `authors` to specify multiple entries:
 
 ```yaml
 ---
-author: <author_id>
+author: <author_id>                     # for single entry
+# or
+authors: [<author1_id>, <author2_id>]   # for multiple entries
 ---
 ```
 
-> Another benefit of reading the author information from the file `_data/authors.yml`{: .filepath } is that the page will have the meta tag `twitter:creator`, which enriches the [Twitter Cards](https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started#card-and-content-attribution) and is good for SEO.
+
+Having said that, the key `author` can also identify multiple entries.
+
+> The benefit of reading the author information from the file `_data/authors.yml`{: .filepath } is that the page will have the meta tag `twitter:creator`, which enriches the [Twitter Cards](https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started#card-and-content-attribution) and is good for SEO.
 {: .prompt-info }
 
 ## Table of Contents
@@ -128,12 +134,15 @@ _Image Caption_
 
 ### Size
 
-In order to prevent the page content layout from shifting when the image is loaded, we should set the width and height for each image:
+In order to prevent the page content layout from shifting when the image is loaded, we should set the width and height for each image.
 
 ```markdown
 ![Desktop View](/assets/img/sample/mockup.png){: width="700" height="400" }
 ```
 {: .nolineno}
+
+> For an SVG, you have to at least specify its _width_, otherwise it won't be rendered.
+{: .prompt-info }
 
 Starting from _Chirpy v5.0.0_, `height` and `width` support abbreviations (`height` → `h`, `width` → `w`). The following example has the same effect as the above:
 
@@ -172,9 +181,18 @@ By default, the image is centered, but you can specify the position by using one
   ```
   {: .nolineno}
 
+### Dark/Light mode
+
+You can make images follow theme preferences in dark/light mode. This requires you to prepare two images, one for dark mode and one for light mode, and then assign them a specific class (`dark` or `light`):
+
+```markdown
+![Light mode only](/path/to/light-mode.png){: .light }
+![Dark mode only](/path/to/dark-mode.png){: .dark }
+```
+
 ### Shadow
 
-The screenshots of the program window can be considered to show the shadow effect, and the shadow will be visible in the `light` mode:
+The screenshots of the program window can be considered to show the shadow effect:
 
 ```markdown
 ![Desktop View](/assets/img/sample/mockup.png){: .shadow }
@@ -204,7 +222,7 @@ The parsing result will automatically add the CDN prefix `https://cdn.com` befor
 ```html
 <img src="https://cdn.com/path/to/flower.png" alt="The flower">
 ```
-{: .nolineno}
+{: .nolineno }
 
 ### Image Path
 
@@ -215,7 +233,6 @@ When a post contains many images, it will be a time-consuming task to repeatedly
 img_path: /img/path/
 ---
 ```
-{: .nolineno }
 
 And then, the image source of Markdown can write the file name directly:
 
@@ -233,21 +250,48 @@ The output will be:
 
 ### Preview Image
 
-If you want to add an image to the top of the post contents, specify the attribute `path`, `width`, `height`, and `alt` for the image:
+If you want to add an image at the top of the post, please provide an image with a resolution of `1200 x 630`. Please note that if the image aspect ratio does not meet `1.91 : 1`, the image will be scaled and cropped.
+
+Knowing these prerequisites, you can start setting the image's attribute:
 
 ```yaml
 ---
 image:
-  path: /path/to/image/file
-  width: 1000   # in pixels
-  height: 400   # in pixels
+  path: /path/to/image
   alt: image alternative text
 ---
 ```
 
-Except for `alt`, all other options are necessary, especially the `width` and `height`, which are related to user experience and web page loading performance. The above section "[Size](#size)" also mentions this.
+Note that the [`img_path`](#image-path) can also be passed to the preview image, that is, when it has been set, the  attribute `path` only needs the image file name.
 
-Starting from _Chirpy v5.0.0_, the attributes `height` and `width` can be abbreviated: `height` → `h`, `width` → `w`. In addition, the [`img_path`](#image-path) can also be passed to the preview image, that is, when it has been set, the  attribute `path` only needs the image file name.
+For simple use, you can also just use `image` to define the path.
+
+```yml
+---
+image: /path/to/image
+---
+```
+
+### LQIP
+
+For preview images:
+
+```yaml
+---
+image:
+  lqip: /path/to/lqip-file # or base64 URI
+---
+```
+
+> You can observe LQIP in the preview image of post [_Text and Typography_](/posts/text-and-typography/).
+
+
+For normal images:
+
+```markdown
+![Image description](/path/to/image){: lqip="/path/to/lqip-file" }
+```
+{: .nolineno }
 
 ## Pinned Posts
 
@@ -345,6 +389,24 @@ If you want to display the **Liquid** snippet, surround the liquid code with `{%
 ````
 
 Or adding `render_with_liquid: false` (Requires Jekyll 4.0 or higher) to the post's YAML block.
+
+## Videos
+
+You can embed a video with the following syntax:
+
+```liquid
+{% include embed/{Platform}.html id='{ID}' %}
+```
+Where `Platform` is the lowercase of the platform name, and `ID` is the video ID.
+
+The following table shows how to get the two parameters we need in a given video URL, and you can also know the currently supported video platforms.
+
+| Video URL                                                                                          | Platform  | ID            |
+|----------------------------------------------------------------------------------------------------|-----------|:--------------|
+| [https://www.**youtube**.com/watch?v=**H-B46URT4mg**](https://www.youtube.com/watch?v=H-B46URT4mg) | `youtube` | `H-B46URT4mg` |
+| [https://www.**twitch**.tv/videos/**1634779211**](https://www.twitch.tv/videos/1634779211)         | `twitch`  | `1634779211`  |
+
+
 
 ## Learn More
 

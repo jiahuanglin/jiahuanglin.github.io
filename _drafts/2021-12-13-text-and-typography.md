@@ -6,42 +6,30 @@ author:
 date: 2021-12-13 22:48:00 -0500
 categories: [Blogging, Demo]
 tags: [typography]
+pin: true
 math: true
 mermaid: true
 image:
-  src: /commons/devices-mockup.png
-  width: 800
-  height: 500
+  path: /commons/devices-mockup.png
+  lqip: data:image/webp;base64,UklGRpoAAABXRUJQVlA4WAoAAAAQAAAADwAABwAAQUxQSDIAAAARL0AmbZurmr57yyIiqE8oiG0bejIYEQTgqiDA9vqnsUSI6H+oAERp2HZ65qP/VIAWAFZQOCBCAAAA8AEAnQEqEAAIAAVAfCWkAALp8sF8rgRgAP7o9FDvMCkMde9PK7euH5M1m6VWoDXf2FkP3BqV0ZYbO6NA/VFIAAAA
+  alt: Responsive rendering of Chirpy theme on multiple devices.
 ---
 
 This post is to show Markdown syntax rendering on [**Chirpy**](https://github.com/cotes2020/jekyll-theme-chirpy/fork), you can also use it as an example of writing. Now, let's start looking at text and typography.
 
+## Headings
 
-## Titles
----
-# H1 - heading
+<h1 class="mt-5">H1 - heading</h1>
 
 <h2 data-toc-skip>H2 - heading</h2>
 
 <h3 data-toc-skip>H3 - heading</h3>
 
 <h4>H4 - heading</h4>
----
-<br>
 
 ## Paragraph
 
-I wandered lonely as a cloud
-
-That floats on high o'er vales and hills,
-
-When all at once I saw a crowd,
-
-A host, of golden daffodils;
-
-Beside the lake, beneath the trees,
-
-Fluttering and dancing in the breeze.
+Quisque egestas convallis ipsum, ut sollicitudin risus tincidunt a. Maecenas interdum malesuada egestas. Duis consectetur porta risus, sit amet vulputate urna facilisis ac. Phasellus semper dui non purus ultrices sodales. Aliquam ante lorem, ornare a feugiat ac, finibus nec mauris. Vivamus ut tristique nisi. Sed vel leo vulputate, efficitur risus non, posuere mi. Nullam tincidunt bibendum rutrum. Proin commodo ornare sapien. Vivamus interdum diam sed sapien blandit, sit amet aliquam risus mattis. Nullam arcu turpis, mollis quis laoreet at, placerat id nibh. Suspendisse venenatis eros eros.
 
 ## Lists
 
@@ -54,17 +42,15 @@ Fluttering and dancing in the breeze.
 ### Unordered list
 
 - Chapter
-  - Section
-    - Paragraph
+  + Section
+    * Paragraph
 
-### Task list
+### ToDo list
 
-- [ ] TODO
-- [x] Completed
-- [ ] Defeat COVID-19
-  - [x] Vaccine production
-  - [ ] Economic recovery
-  - [ ] People smile again
+- [ ] Job
+  + [x] Step 1
+  + [x] Step 2
+  + [ ] Step 3
 
 ### Description list
 
@@ -94,51 +80,39 @@ Moon
 
 Click the hook will locate the footnote[^footnote], and here is another footnote[^fn-nth-2].
 
-## Images
+## Inline code
 
-- Default (with caption)
+This is an example of `Inline Code`.
 
-![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" }
-_Full screen width and center alignment_
+## Filepath
 
-<br>
+Here is the `/path/to/the/file.extend`{: .filepath}.
 
-- Shadow
+## Code blocks
 
-![Window shadow](/posts/20190808/window.png){: .shadow width="1548" height="864" style="max-width: 90%" }
-_shadow effect (visible in light mode)_
+### Common
 
-<br>
-
-- Left aligned
-
-![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" style="max-width: 70%" .normal}
-
-<br>
-
-- Float to left
-
-  ![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" style="max-width: 200px" .left}
-  "A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space."
-
-<br>
-
-- Float to right
-
-  ![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" style="max-width: 200px" .right}
-  "A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space. A repetitive and meaningless text is used to fill the space."
-
-<br>
-
-## Mermaid SVG
-
-```mermaid
- gantt
-  title  Adding GANTT diagram functionality to mermaid
-  apple :a, 2017-07-20, 1w
-  banana :crit, b, 2017-07-23, 1d
-  cherry :active, c, after b a, 1d
 ```
+This is a common code snippet, without syntax highlight and line number.
+```
+
+### Specific Language
+
+```bash
+if [ $? -ne 0 ]; then
+  echo "The command was not successful.";
+  #do the needful / exit
+fi;
+```
+
+### Specific filename
+
+```sass
+@import
+  "colors/light-typography",
+  "colors/dark-typography";
+```
+{: file='_sass/jekyll-theme-chirpy.scss'}
 
 ## Mathematics
 
@@ -150,8 +124,9 @@ When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are
 
 $$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $$
 
-## Inline code
+## Mermaid SVG
 
+<<<<<<< HEAD:_drafts/2021-12-13-text-and-typography.md
 This is an example of `Inline Code`.
 
 ## Code block
@@ -160,35 +135,47 @@ This is an example of `Inline Code`.
 
 ```
 This is a common code snippet, without syntax highlight and line number.
+=======
+```mermaid
+ gantt
+  title  Adding GANTT diagram functionality to mermaid
+  apple :a, 2017-07-20, 1w
+  banana :crit, b, 2017-07-23, 1d
+  cherry :active, c, after b a, 1d
+>>>>>>> upstream/master:_posts/2019-08-08-text-and-typography.md
 ```
 
-### Specific Languages
+## Images
 
-#### Console
+### Default (with caption)
 
-```console
-$ env |grep SHELL
-SHELL=/usr/local/bin/bash
-PYENV_SHELL=bash
-```
+![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" }
+_Full screen width and center alignment_
 
-#### Shell
+### Left aligned
 
-```bash
-if [ $? -ne 0 ]; then
-    echo "The command was not successful.";
-    #do the needful / exit
-fi;
-```
+![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" .w-75 .normal}
 
-### Specific filename
+### Float to left
 
-```sass
-@import
-  "colors/light-typography",
-  "colors/dark-typography"
-```
-{: file='_sass/jekyll-theme-chirpy.scss'}
+![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" .w-50 .left}
+Praesent maximus aliquam sapien. Sed vel neque in dolor pulvinar auctor. Maecenas pharetra, sem sit amet interdum posuere, tellus lacus eleifend magna, ac lobortis felis ipsum id sapien. Proin ornare rutrum metus, ac convallis diam volutpat sit amet. Phasellus volutpat, elit sit amet tincidunt mollis, felis mi scelerisque mauris, ut facilisis leo magna accumsan sapien. In rutrum vehicula nisl eget tempor. Nullam maximus ullamcorper libero non maximus. Integer ultricies velit id convallis varius. Praesent eu nisl eu urna finibus ultrices id nec ex. Mauris ac mattis quam. Fusce aliquam est nec sapien bibendum, vitae malesuada ligula condimentum.
+
+### Float to right
+
+![Desktop View](/posts/20190808/mockup.png){: width="972" height="589" .w-50 .right}
+Praesent maximus aliquam sapien. Sed vel neque in dolor pulvinar auctor. Maecenas pharetra, sem sit amet interdum posuere, tellus lacus eleifend magna, ac lobortis felis ipsum id sapien. Proin ornare rutrum metus, ac convallis diam volutpat sit amet. Phasellus volutpat, elit sit amet tincidunt mollis, felis mi scelerisque mauris, ut facilisis leo magna accumsan sapien. In rutrum vehicula nisl eget tempor. Nullam maximus ullamcorper libero non maximus. Integer ultricies velit id convallis varius. Praesent eu nisl eu urna finibus ultrices id nec ex. Mauris ac mattis quam. Fusce aliquam est nec sapien bibendum, vitae malesuada ligula condimentum.
+
+### Dark/Light mode & Shadow
+
+The image below will toggle dark/light mode based on theme preference, notice it has shadows.
+
+![light mode only](/posts/20190808/devtools-light.png){: .light .w-75 .shadow .rounded-10 w='1212' h='668' }
+![dark mode only](/posts/20190808/devtools-dark.png){: .dark .w-75 .shadow .rounded-10 w='1212' h='668' }
+
+## Video
+
+{% include embed/youtube.html id='Balreaj8Yqs' %}
 
 ## Reverse Footnote
 
