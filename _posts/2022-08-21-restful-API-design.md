@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2022-08-21 22:38:00 -0500
 categories: [Software]
-tags: [framework, frontend]
+tags: [API, design]
 ---
 
 ## RESTful API
