@@ -5,7 +5,7 @@ author:
   link: https://github.com/jiahuanglin
 date: 2022-12-20 21:21:00 -0500
 categories: [System]
-tags: [distributed system, data processing]
+tags: [distributed system, Spark]
 ---
 
 ## Before Spark, there was Hadoop
