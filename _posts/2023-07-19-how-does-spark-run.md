@@ -28,7 +28,7 @@ Running Executors in different environments is achieved through different implem
 ## Submit job to Spark
 The command to submit tasks is called `spark-submit`:
 
-```
+```Bash
 bin/spark-submit 
   --deploy-mode cluster \
   --executor-memory 20G \
@@ -55,7 +55,7 @@ The client performs the following tasks:
 
 The following code demonstrates the high-level flow of how the client submits the Application to the ResourceManager:
 
-```Scala
+```
 // Create SparkSubmitArguments object with input arguments
 appArgs = new SparkSubmitArguments(args)
 
@@ -114,7 +114,7 @@ YARN does the following:
 8. Finally, the tasks will run within the `CoarseGrainedExecutorBackend`
 
 
-```Scala
+```
 // Define ApplicationMaster object
 object ApplicationMaster extends Logging {
   private var master: ApplicationMaster = _
@@ -242,7 +242,7 @@ Overall it's the following process:
 9. SchedulerBackend requests resources, obtains Worker Offers
 10. TaskDescriptions are computed and sent to the SchedulerBackend, which distributes the tasks to Executors.
 
-```Scala
+```
 // RDD class
 abstract class RDD[T: ClassTag](_sc: SparkContext, deps: Seq[Dependency[_]]) extends Serializable with Logging {
   def collect(): Array[T] = withScope {
