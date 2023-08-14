@@ -1,5 +1,5 @@
 ---
-title: Locality Sensitive Hashing
+title: Locality sensitive hashing
 author:
   name: Jacob Lin
   link: https://github.com/jiahuanglin
